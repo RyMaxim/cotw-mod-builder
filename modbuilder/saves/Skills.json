@@ -1,5 +1,5 @@
 {
-  "version": "2.2.10",
+  "version": "2.3.0",
   "mod_options": {
     "modify_skills_skill_tier_cost": {
       "reduce_skill_tier_cost": true,

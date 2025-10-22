@@ -2,13 +2,19 @@ DEBUG = False
 NAME = "Modify Backpacks"
 DESCRIPTION = "Adjust the carry weight, noise, and visibility stats of backpacks. Cost can be edited with Modify Store."
 FILE = "settings/hp_settings/equipment_stats_ui.bin"
+BACKPACK_STATS = {
+    "large": {"weight": 9, "noise": 9, "scent": 0, "vision": 7},
+    "medium": {"weight": 6, "noise": 6, "scent": 0, "vision": 4},
+    "small": {"weight": 3, "noise": 3, "scent": 0, "vision": 1},
+}
+
 OPTIONS = [
     {
         "name": "Large Backpack Carry Weight",
         "style": "slider",
         "min": 0,
         "max": 1000,
-        "initial": 9,
+        "initial": BACKPACK_STATS["large"]["weight"],
         "increment": 1,
         "note": "Summit Explorer 6000 Pack",
     },
@@ -17,7 +23,7 @@ OPTIONS = [
         "style": "slider",
         "min": 0,
         "max": 100,
-        "initial": 7,
+        "initial": BACKPACK_STATS["large"]["noise"],
         "increment": 1,
     },
     {
@@ -25,7 +31,7 @@ OPTIONS = [
         "style": "slider",
         "min": 0,
         "max": 100,
-        "initial": 5,
+        "initial": BACKPACK_STATS["large"]["vision"],
         "increment": 1,
     },
     {
@@ -33,7 +39,7 @@ OPTIONS = [
         "style": "slider",
         "min": 0,
         "max": 1000,
-        "initial": 6,
+        "initial": BACKPACK_STATS["medium"]["weight"],
         "increment": 1,
         "note": "ExoAdventurere 32 Light Daypack",
     },
@@ -42,7 +48,7 @@ OPTIONS = [
         "style": "slider",
         "min": 0,
         "max": 100,
-        "initial": 5,
+        "initial": BACKPACK_STATS["medium"]["noise"],
         "increment": 1,
     },
     {
@@ -50,7 +56,7 @@ OPTIONS = [
         "style": "slider",
         "min": 0,
         "max": 100,
-        "initial": 3,
+        "initial": BACKPACK_STATS["medium"]["vision"],
         "increment": 1,
     },
     {
@@ -58,7 +64,7 @@ OPTIONS = [
         "style": "slider",
         "min": 0,
         "max": 1000,
-        "initial": 3,
+        "initial": BACKPACK_STATS["small"]["weight"],
         "increment": 1,
         "note": "TrailScout Mini Daypack",
     },
@@ -67,7 +73,7 @@ OPTIONS = [
         "style": "slider",
         "min": 0,
         "max": 100,
-        "initial": 3,
+        "initial": BACKPACK_STATS["small"]["noise"],
         "increment": 1,
     },
     {
@@ -75,7 +81,7 @@ OPTIONS = [
         "style": "slider",
         "min": 0,
         "max": 100,
-        "initial": 1,
+        "initial": BACKPACK_STATS["small"]["vision"],
         "increment": 1,
     },
 ]
@@ -85,16 +91,21 @@ def format_options(options: dict) -> str:
     lg_size = int(options["large_backpack_carry_weight"])
     lg_noise = int(options["large_backpack_noise"])
     lg_visiblity = int(options["large_backpack_visibility"])
+
     med_size = int(options["medium_backpack_carry_weight"])
     med_noise = int(options["medium_backpack_noise"])
     med_visiblity = int(options["medium_backpack_visibility"])
+
     sm_size = int(options["small_backpack_carry_weight"])
     sm_noise = int(options["small_backpack_noise"])
     sm_visiblity = int(options["small_backpack_visibility"])
+
     formatted = (
-        f"Modify Backpacks (Large: {lg_size}kg, {lg_noise}, {lg_visiblity} | "
-        f"Med: {med_size}kg, {med_noise}, {med_visiblity} | "
-        f"Small: {sm_size}kg, {sm_noise}, {sm_visiblity})"
+        "Modify Backpacks ("
+        f"Large: {lg_size}kg, {lg_noise}, {lg_visiblity} | "
+        f"Meddium: {med_size}kg, {med_noise}, {med_visiblity} | "
+        f"Small: {sm_size}kg, {sm_noise}, {sm_visiblity}"
+        ")"
     )
     return formatted
 

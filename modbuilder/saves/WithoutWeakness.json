@@ -1,5 +1,5 @@
 {
-  "version": "2.2.10",
+  "version": "2.3.0",
   "mod_options": {
     "remove_intro_logos": {},
     "clean_scope_lenses": {
@@ -128,9 +128,9 @@
       "modify_reticle_cost": "Free",
       "cost": 0.0
     },
-    "modify_store_structure": {
-      "type": "structure",
-      "file": "settings/hp_settings/equipment_data.bin",
+    "modify_store_feeder_bait": {
+      "type": "feeder_bait",
+      "file": "settings/hp_settings/animal_interest.bin",
       "discount": 90,
       "free_price": 0,
       "bulk_quantity": 0,
@@ -138,6 +138,14 @@
     },
     "modify_store_skin": {
       "type": "skin",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "discount": 90,
+      "free_price": 0,
+      "bulk_quantity": 0,
+      "bulk_weight": -1
+    },
+    "modify_store_structure": {
+      "type": "structure",
       "file": "settings/hp_settings/equipment_data.bin",
       "discount": 90,
       "free_price": 0,

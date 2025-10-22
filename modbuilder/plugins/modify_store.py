@@ -7,12 +7,19 @@ from modbuilder import mods
 from modbuilder.logging_config import get_logger
 from modbuilder.mods import StatWithOffset
 
+try:  # running normally (source)
+    from modbuilder.plugins import modify_lures
+except ModuleNotFoundError:  # running as an exe (PyInstaller)
+    from plugins import modify_lures
+
 logger = get_logger(__name__)
+
 
 DEBUG = False
 NAME = "Modify Store"
 DESCRIPTION = "Modify prices and quantites of store items or apply bulk changes to an entire category. Individual and bulk changes in the same category can cause unintended results."
 EQUIPMENT_FILE = mods.EQUIPMENT_DATA_FILE
+LURE_FILE = modify_lures.FILE
 
 class StoreItem:
   __slots__ = (
@@ -53,6 +60,7 @@ class StoreItem:
     self.price = StatWithOffset(value=0, offset=0)
     self.quantity = StatWithOffset(value=0, offset=0)  # some items do not have quantity
     self.weight = StatWithOffset(value=-1, offset=0)  # some items do not have weight, -1 allows for legitimate items with 0 weight
+
     for prop in equipment_node.prop_table:
       name_hash = prop.name_hash
       data = prop.data
@@ -117,6 +125,8 @@ class StoreItem:
         self.display_name = f"{self.display_name}: {detailed_type}"
     if self.type == "lure":
       self.display_name = f"{detailed_type}: {self.display_name.replace(" Decoy","").replace(" Caller","").replace(" Scent","")}"
+    if self.type == "structure" and self.detailed_type:
+      self.display_name = f"{detailed_type}: {self.display_name}"
 
 def load_equipment_data(
     equipment_nodes: list[RtpcNode],
@@ -134,6 +144,10 @@ def load_equipment_data(
     loaded_items.append(loaded_item)
   return sorted(loaded_items, key=lambda x: x.display_name)
 
+def load_feeder_bait_data() -> list[modify_lures.Lure]:
+  feeder_bait = [item for item in modify_lures.ALL_LURES if item.type == "feeder_bait"]
+  return sorted(feeder_bait, key=lambda x: x.display_name)
+
 def load_store_items() -> dict[str, list[StoreItem]]:
   equipment = mods.open_rtpc(mods.APP_DIR_PATH / "org" / EQUIPMENT_FILE)
   store_items = {}
@@ -147,12 +161,13 @@ def load_store_items() -> dict[str, list[StoreItem]]:
   store_items["weapon"] = load_equipment_data(equipment.child_table[6].child_table, "weapon")
   store_items["structure"] = load_equipment_data(equipment.child_table[7].child_table, "structure")
   store_items["lure"] = load_equipment_data(equipment.child_table[8].child_table, "lure")
+  store_items["feeder_bait"] = load_feeder_bait_data()
   logger.debug("Loaded store items")
   return store_items
 
 def build_tab(item_type: str) -> sg.Tab:
   item_list = ALL_STORE_ITEMS[item_type]
-  return sg.Tab(item_type.capitalize(), [
+  return sg.Tab(mods.title_from_key(item_type), [
     [sg.Combo([item.display_name for item in item_list], metadata=item_list, size=30, key=f"store_list_{item_type}", enable_events=True, expand_x=True)]
   ], key=f"store_tab_{item_type}")
 
@@ -205,8 +220,8 @@ def get_selected_item(window: sg.Window, values: dict) -> StoreItem:
   item_name = values.get(item_list)
   if item_name:
     try:
-      ammo_index = window[item_list].Values.index(item_name)
-      return window[item_list].metadata[ammo_index]
+      item_index = window[item_list].Values.index(item_name)
+      return window[item_list].metadata[item_index]
     except ValueError as _e:  # user typed/edited data in box and we cannot match
       pass
   return None
@@ -225,10 +240,10 @@ def handle_event(event: str, window: sg.Window, values: dict) -> None:
         window["store_item_quantity"].update("")
         window["store_item_weight"].update("")
     if event.startswith("store_tab_"):
-      category_quantity_disabled = bool(item_type in ["sight", "optic", "skin", "weapon"])
+      category_quantity_disabled = bool(item_type in ["sight", "optic", "skin", "weapon", "feeder_bait"])
       window["store_item_quantity"].update(disabled=category_quantity_disabled)
       window["store_bulk_quantity"].update(disabled=category_quantity_disabled)
-      category_weight_disabled = bool(item_type in ["skin"])
+      category_weight_disabled = bool(item_type in ["skin", "feeder_bait"])
       window["store_item_weight"].update(disabled=category_weight_disabled)
       window["store_bulk_weight"].update(disabled=category_weight_disabled)
 
@@ -267,7 +282,7 @@ def add_mod(window: sg.Window, values: dict) -> dict:
       "type": selected_item.type,
       "name": selected_item.name,
       "display_name": selected_item.display_name,
-      "file": EQUIPMENT_FILE,
+      "file": LURE_FILE if selected_item.type == "feeder_bait" else EQUIPMENT_FILE,
       "price": item_price,
       "quantity": item_quantity,
       "weight": item_weight,
@@ -308,7 +323,7 @@ def add_mod_group(window: sg.Window, values: dict) -> dict:
     "invalid": None,
     "options": {
       "type": item_type,
-      "file": EQUIPMENT_FILE,
+      "file": LURE_FILE if item_type == "feeder_bait" else EQUIPMENT_FILE,
       "discount": bulk_discount,
       "free_price": bulk_free_price,
       "bulk_quantity": bulk_quantity,
@@ -326,10 +341,12 @@ def format_options(options: dict) -> str:
       details.append(f"{bulk_quantity} quantity")
     if (bulk_weight := options.get("bulk_weight", -1)) >= 0:
       details.append(f"{bulk_weight} kg")
-    return f"Modify Store Category: {options['type'].capitalize()} ({' ,'.join(details)})"
+    return f"Modify Store Category: {mods.title_from_key(options["type"])} ({' ,'.join(details)})"
   else:  # single item
     display_name = options.get("display_name", options["name"])  # diplay_name added in 2.2.2
-    selected_item = match_old_item(options)  # try to match options to a StoreItem
+    selected_item = next((i for i in ALL_STORE_ITEMS[options["type"]] if options["name"] == i.name), None)
+    if not selected_item:
+      selected_item = match_old_item(options)  # try to match options to a StoreItem
     if selected_item:
       display_name = selected_item.display_name
     details.append(f"${options["price"]}")
@@ -337,13 +354,13 @@ def format_options(options: dict) -> str:
       details.append(f"{options["quantity"]} quantity")
     if (weight := options.get("weight", -1)) >= 0:
       details.append(f"{weight} kg")
-    return f"Modify Store: {options['type'].capitalize()} - {display_name} ({' ,'.join(details)})"
+    return f"Modify Store: {mods.title_from_key(options["type"])} - {display_name} ({' ,'.join(details)})"
 
 def handle_key(mod_key: str) -> bool:
   return mod_key.startswith("modify_store")
 
 def get_files(options: dict) -> list[str]:
-  return [EQUIPMENT_FILE]
+  return [LURE_FILE if options["type"] == "feeder_bait" else EQUIPMENT_FILE]
 
 def process(options: dict) -> None:
   updates = []
@@ -373,7 +390,7 @@ def process(options: dict) -> None:
       if bulk_weight >= 0 and item.weight.offset > 0:
         updates.append({"offset": item.weight.offset, "value": bulk_weight})
 
-  mods.apply_updates_to_file(EQUIPMENT_FILE, updates)
+  mods.apply_updates_to_file(LURE_FILE if options["type"] == "feeder_bait" else EQUIPMENT_FILE, updates)
 
 def match_old_item(options: dict) -> StoreItem:
   selected_item = None
@@ -389,6 +406,7 @@ def match_old_item(options: dict) -> StoreItem:
     "eurasian teal  decoy",   # "Eurasian Wigeon" and "Goldeneye" hen decoys are mistakenly named in game files
     "eurasian teal decoy",  # "Eurasian Wigeon" drake decoys are mistakenly named in game files
   )
+
   if not options["name"].lower().startswith(unmatchable_names):
     cleaned_name = re.sub(r"\s*\(id: \d+\)", "", options["name"]).rstrip()  # remove " (id: 12345)"
     selected_item = next((i for i in ALL_STORE_ITEMS[options["type"]] if cleaned_name == i.internal_name), None)
@@ -416,6 +434,8 @@ def match_old_item(options: dict) -> StoreItem:
 
 def handle_update(mod_key: str, mod_options: dict, version: str) -> tuple[str, dict]:
   """
+  2.2.13
+  - Modify prices of Feeder Bait from `animal_interest.bin` + Modify Lures
   2.2.7
   - Add weight modification
   2.2.5
@@ -437,7 +457,7 @@ def handle_update(mod_key: str, mod_options: dict, version: str) -> tuple[str, d
       "type": selected_item.type,
       "name": selected_item.name,
       "display_name": selected_item.display_name,
-      "file": EQUIPMENT_FILE,
+      "file": LURE_FILE if selected_item.type == "feeder_bait" else EQUIPMENT_FILE,
       "price": mod_options["price"],
       "quantity": mod_options.get("quantity", 0),
       "weight": mod_options.get("weight", -1),
@@ -447,7 +467,7 @@ def handle_update(mod_key: str, mod_options: dict, version: str) -> tuple[str, d
     updated_mod_key = f"modify_store_{mod_options["type"]}"
     updated_mod_options = {
       "type": mod_options["type"],
-      "file": EQUIPMENT_FILE,
+      "file": LURE_FILE if mod_options["type"] == "feeder_bait" else EQUIPMENT_FILE,
       "discount": mod_options["discount"],
       "free_price": mod_options["free_price"],
       "bulk_quantity": mod_options.get("bulk_quantity", 0),  # some pre-2.1.0 version didn't have "bulk_quantity"

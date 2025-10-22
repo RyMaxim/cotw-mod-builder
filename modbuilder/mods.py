@@ -39,6 +39,7 @@ GLOBAL_ANIMALS_PATH = APP_DIR_PATH / "org" / GLOBAL_ANIMALS_SRC_PATH
 GAME_PATH_FILE = APP_DIR_PATH / "game_path.txt"
 EQUIPMENT_DATA_FILE = "settings/hp_settings/equipment_data.bin"
 EQUIPMENT_UI_FILE = "settings/hp_settings/equipment_stats_ui.bin"
+ANIMAL_INTEREST_FILE = "settings/hp_settings/animal_interest.bin"
 MODS_EQUIPMENT_UI_DATA = None
 MODS_LIST = DEBUG_MODS_LIST = None
 GLOBAL_FILES = LOCAL_PLAYER_FILES = NETWORK_PLAYER_FILES = GLOBAL_ANIMAL_FILES = None
@@ -142,7 +143,7 @@ def format_mod_display_name(mod_key:str, mod_options) -> str:
   mod = get_mod(mod_key)
   if mod is None:
     formatted_name = get_mod_name_from_key(mod_key).title()
-  elif hasattr(mod, "format"):
+  elif hasattr(mod, "format_options"):
     formatted_name = mod.format_options(mod_options)
   else:
     formatted_name = get_mod_full_name_from_key(mod_key).title()
@@ -152,6 +153,9 @@ def delegate_event(event: str, window: sg.Window, values: dict) -> None:
   for mod in MODS_LIST.values():
     if hasattr(mod, "handle_event"):
       mod.handle_event(event, window, values)
+
+def title_from_key(key: str) -> str:
+  return " ".join(key.split("_")).title()
 
 def get_mod_name_from_key(mod_key: str) -> str:
   return " ".join(mod_key.lower().split("_"))
@@ -173,20 +177,27 @@ def get_mod_option(mod_key: str, option_key: str) -> dict:
       return option
   return None
 
-def get_mod_option_default(option_key: str, options: dict = None, mod_key: str = None) -> float:
+def get_mod_option_default(option_key: str, options: list[dict] = None, mod_key: str = None) -> float:
   default = None
   if options is None and mod_key is None:
     raise ValueError(f"Unable to get default value for {option_key}: no options or mod_key provided. ")
   if options:
     for option in options:
       if option_key == get_mod_key_from_name(option["name"]):
-        default = option["default"]
+        default = option.get("default", "initial")
   if options is None:
     option = get_mod_option(option_key, mod_key)
-    default = option["default"]
+    default = option.get("default", "initial")
   if default is None:
     raise ValueError(f"Unable to get default value for {option_key}: no matching option found")
   return default
+
+def get_mod_option_defaults(options: list[dict] = None) -> dict:
+  defaults = {}
+  for option in options:
+    key = get_mod_key_from_name(option["name"])
+    defaults[key] = get_mod_option_default(key, options)
+  return defaults
 
 def list_mod_files() -> list[str]:
   return _get_mod_filenames()

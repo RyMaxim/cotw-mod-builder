@@ -1234,6 +1234,18 @@ weapon:
 
 structure:
 
+  bait_feeder_bear_barrel:
+    name: Bait Barrel
+    type: Feeder
+
+  bait_feeder_box:
+    name: Box Feeder
+    type: Feeder
+
+  bait_feeder_hanging:
+    name: Post Feeder
+    type: Feeder
+
   groundblind:
     name: Ground Blind  # Incognito Deluxe Ground Blind
     style:
@@ -1542,3 +1554,31 @@ lure:
   scent_wild_boar:
     name: Wild Boar Scent
     type: Scent
+
+##########
+
+feeder_bait:
+
+  bait_site_post_soy:
+    name: Fortified Pellet Feed
+    type: Post Feeder
+
+  bait_site_sour_mash:
+    name: Sour Fermented Mash
+    type: Bait Barrel
+
+  bait_site_post_corn:
+    name: Multigrain Flake Mix
+    type: Post Feeder
+
+  bait_site_barrel_meat:
+    name: Meat Scraps
+    type: Bait Barrel
+
+  bait_site_box_soy:
+    name: Fortified Pellet Feed
+    type: Box Feeder
+
+  bait_site_box_corn:
+    name: Multigrain Flake Mix
+    type: Box Feeder

@@ -24,6 +24,7 @@ class Deployable(str, Enum):
   TRIPOD = "tripodstand"
   GROUNDBLIND = "groundblind"
   DECOY = "decoy"
+  BAIT_FEEDER = "bait_feeder"
 
 class DeployableValue:
   def __init__(self, value: int, offset: int) -> None:
@@ -34,12 +35,15 @@ class DeployableValue:
     return f"{self.value:} ({self.offset}))"
 
 def is_deployable_prop(value: str) -> bool:
-  return Deployable.LAYOUTBLIND in value or \
-    Deployable.TREESTAND in value or \
-      Deployable.TENT in value or \
-        Deployable.TRIPOD in value or \
-          Deployable.GROUNDBLIND in value or \
-            Deployable.DECOY in value
+  return any(x in value for x in (
+    Deployable.LAYOUTBLIND,
+    Deployable.TREESTAND,
+    Deployable.TENT,
+    Deployable.TRIPOD,
+    Deployable.GROUNDBLIND,
+    Deployable.DECOY,
+    Deployable.BAIT_FEEDER,
+  ))
 
 def is_deployable(props: list[RtpcProperty]) -> bool:
   for prop in props:
