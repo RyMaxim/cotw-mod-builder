@@ -31,6 +31,7 @@ class StoreItem:
     'price',
     'quantity',
     'weight',
+    'locked',
   )
 
   type: str                   # item type
@@ -41,6 +42,7 @@ class StoreItem:
   price: StatWithOffset
   quantity: StatWithOffset
   weight: StatWithOffset
+  locked: StatWithOffset
 
   def __init__(self, equipment_node: RtpcNode, equipment_type: str) -> None:
     self.type = equipment_type
@@ -49,7 +51,9 @@ class StoreItem:
     self._parse_prop_table(equipment_node)
     if self.type == "skin":
       self.display_name = self._parse_skin_name()
-    if self.type != "skin":
+    elif self.type == "trophy_holder":
+      self.display_name = self._parse_trophy_holder_name()
+    else:
       self._map_equipment_name()
     self._format_display_name()
 
@@ -60,6 +64,7 @@ class StoreItem:
     self.price = StatWithOffset(value=0, offset=0)
     self.quantity = StatWithOffset(value=0, offset=0)  # some items do not have quantity
     self.weight = StatWithOffset(value=-1, offset=0)  # some items do not have weight, -1 allows for legitimate items with 0 weight
+    self.locked = StatWithOffset(value=0, offset=0)
 
     for prop in equipment_node.prop_table:
       name_hash = prop.name_hash
@@ -86,27 +91,109 @@ class StoreItem:
           # those items will have a "quantity" of 4294967295 (max 32-bit integer) that we can ignore
           self.quantity = StatWithOffset(prop)
 
-  def _parse_skin_name(self) -> None:
-    skin_types = {
-      "t1": "Paint",
-      "t2": "Spray",
-      "t3": "Material",
-      "t4": "Camo",
-      "t5": "Wrap",
-    }
-    parts = self.name.split("\\")  # parse texture name into something readable
+      if name_hash == 3003447170:  # 0xb304f782 - locked value
+        self.locked = StatWithOffset(prop)
+
+  def _parse_skin_name(self) -> str:
+    parts = re.split(r"[\\/]", self.name)  # parse texture name into something readable
     category = " ".join([x.capitalize() for x in parts[-2].split("_")])
     name = parts[-1].removesuffix("_dif.ddsc")
     if category == "Crosshair Thumbnails":
       category = "Reticle"
       pattern = r'^thumbnail_crosshair_(.*)_(\d\d)$'  # thumbnail_crosshair_mill_dot_01
       matches = re.match(pattern, name)
-      display_name = f"Reticle: {" ".join([x.capitalize() for x in matches.group(1).split("_")])} {matches.group(2)}"
+      display_name = f"Reticle: {' '.join([x.capitalize() for x in matches.group(1).split('_')])} {matches.group(2)}"
+    elif name.startswith("plaque_rank_"):
+      pattern = r"plaque_rank_(\w+)_(\d+)$"  # plaque_rank_silver_01 >> "Silver 01"
+      matches = re.search(pattern, name)
+      display_name = f"{category}: {matches.group(1).capitalize()} {matches.group(2)}"
     else:
-      pattern = r'(t\d)_(\d\d)$'  # camo_h2_lunar_new_year_1_t3_01 >> "Material 01"
+      skin_types = {
+        "t1": "Paint",
+        "t2": "Spray",
+        "t3": "Material",
+        "t4": "Camo",
+        "t5": "Wrap",
+      }
+      pattern = r'(t\d)_(\d+)$'  # camo_h2_lunar_new_year_1_t3_01 >> "Material 01"
       matches = re.search(pattern, name)
       display_name = f"{category}: {skin_types[matches.group(1)]} {matches.group(2)}"
     return display_name
+
+  def _parse_trophy_holder_name(self) -> str:
+    sizes = {
+      "xs": "XSmall",
+      "s": "Small",
+      "m": "Medium",
+      "l": "Large",
+      "xl": "XLarge",
+      "xxl": "XXLarge",
+    }
+    name = self.name.removeprefix("equipment_trophy_holder_")
+
+    if name.startswith("weapon_rack"):
+      # weapon_rack_crossbow_01 >> "Weapon Rack: Crossbow 01"
+      # weapon_rack_l_01 >> "Weapon Rack: Large 01"
+      parts = name.split("_")
+      token = parts[2]
+      number = parts[3]
+
+      if token in sizes:
+          size = sizes[token]
+          subtype = None
+      else:
+          size = None
+          subtype = token.capitalize()
+
+      category = "Weapon Rack"
+      size_str = f" {size}" if size else ""
+      subtype_str = f" {subtype}" if subtype else ""
+      return f"{category}:{subtype_str or size_str} {number}".strip()
+
+    # Parsing non-weapon racks is trickier
+    # animal_fixed_platform_xl_safari_01 >> "Fixed Platform: Safari 02"
+    # animal_round_special_01 >> "Round Platform: Special 01"
+    # animal_plaque_l_manor_06 >> "Plaque: Manor 06"
+    types = ["fixed", "round", "plaque"]
+    pattern = re.compile(
+        rf'^(?P<animal_flag>animal_)?'
+        rf'(?P<type>{"|".join(types)})'
+        rf'(?:_(?P<token1>[^_]+))?'        # subtype or size
+        rf'(?:_(?P<token2>[^_]+))?'        # subtype or size
+        rf'(?:_(?P<environment>[^_]+))?'   # manor / safari / etc.
+        rf'_(?P<number>\d{{2}})$'
+    )
+    match = pattern.match(name)
+    if not match:
+        return self.name
+
+    d = match.groupdict()
+    holder_type = d["type"]
+    env = d["environment"]
+    number = d["number"]
+    tokens = [t for t in (d["token1"], d["token2"]) if t]
+
+    subtype = None
+    size = None
+    for t in tokens:
+        if t in sizes and size is None:
+            size = sizes[t]
+        elif subtype is None:
+            subtype = t
+
+    category = holder_type.replace("_", " ").title()
+    if subtype in ["platform", "special"] and holder_type in ["fixed","round"]:
+      category += " Platform"
+
+    env_str = f" {env.capitalize()}" if env else ""
+    if size:
+        size_str = f" {size}"
+    elif subtype:
+        size_str = f" {subtype.capitalize()}"
+    else:
+        size_str = ""
+
+    return f"{category}:{env_str}{size_str} {number}".strip()
 
   def _map_equipment_name(self) -> None:
     if (mapped_equipment := mods.map_equipment(self.name, self.type)):
@@ -153,14 +240,15 @@ def load_store_items() -> dict[str, list[StoreItem]]:
   store_items = {}
 
   store_items["ammo"] = load_equipment_data(equipment.child_table[0].child_table, "ammo")
-  store_items["misc"] = load_equipment_data( equipment.child_table[1].child_table, "misc")
-  store_items["sight"] = load_equipment_data(equipment.child_table[2].child_table, "sight")
-  store_items["optic"] = load_equipment_data(equipment.child_table[3].child_table, "optic")
+  store_items["misc"] = load_equipment_data(equipment.child_table[1].child_table, "misc")
+  store_items["trophy_holder"] = load_equipment_data(equipment.child_table[2].child_table, "trophy_holder")
+  store_items["sight"] = load_equipment_data(equipment.child_table[3].child_table, "sight")
+  store_items["optic"] = load_equipment_data(equipment.child_table[4].child_table, "optic")
   # store_items["vehicle"] = load_equipment_data(equipment.child_table[4].child_table, "vehicle")  # free with DLC, $20000 without (multiplayer only). Where is this value?
-  store_items["skin"] = load_equipment_data(equipment.child_table[5].child_table, "skin")
-  store_items["weapon"] = load_equipment_data(equipment.child_table[6].child_table, "weapon")
-  store_items["structure"] = load_equipment_data(equipment.child_table[7].child_table, "structure")
-  store_items["lure"] = load_equipment_data(equipment.child_table[8].child_table, "lure")
+  store_items["skin"] = load_equipment_data(equipment.child_table[6].child_table, "skin")
+  store_items["weapon"] = load_equipment_data(equipment.child_table[7].child_table, "weapon")
+  store_items["structure"] = load_equipment_data(equipment.child_table[8].child_table, "structure")
+  store_items["lure"] = load_equipment_data(equipment.child_table[9].child_table, "lure")
   store_items["feeder_bait"] = load_feeder_bait_data()
   logger.debug("Loaded store items")
   return store_items
@@ -186,6 +274,7 @@ def get_option_elements() -> sg.Column:
         [sg.T("Price:", p=((30,0),(10,0))), sg.Input("", size=10, p=((34,0),(10,0)), k="store_item_price")],
         [sg.T("Quantity:", p=((30,0),(10,0)), k="store_item_quantity_label"), sg.Input("", size=10, p=((10,0),(10,0)), k="store_item_quantity")],
         [sg.T("Weight:", p=((30,0),(10,0)), k="store_item_weight_label"), sg.Input("", size=10, p=((17,0),(10,0)), k="store_item_weight")],
+        # [sg.T("Locked:", p=((30,0),(10,0))), sg.Input("", size=10, p=((22,0),(10,0)), k="store_item_locked")],
       ], p=(0,0), element_justification='left', vertical_alignment='top'),
       sg.Column([
         [sg.T("Bulk:", p=((0,0),(10,0)), text_color="orange"), sg.T('(use "Add Category Modification" to apply changes to all items in this category)', font="_ 12 italic", p=((0,0),(10,0)))],
@@ -205,6 +294,11 @@ def get_option_elements() -> sg.Column:
           sg.Input("", size=10, p=((10,0),(12,0)), k="store_bulk_weight"),
           sg.T('Leave blank to use defaults', font="_ 12 italic", text_color="orange", p=((10,10),(10,0)))
         ],
+        # [
+        #   sg.T("Category Locked:", p=((20,0),(12,0)), k="store_bulk_locked_label"),
+        #   sg.Input("", size=10, p=((10,0),(12,0)), k="store_bulk_locked"),
+        #   sg.T('Leave blank to use defaults', font="_ 12 italic", text_color="orange", p=((10,10),(10,0)))
+        # ],
       ], p=((130,0),(0,0)), element_justification='left', vertical_alignment='top'),
     ],
   ]
@@ -235,17 +329,32 @@ def handle_event(event: str, window: sg.Window, values: dict) -> None:
         window["store_item_price"].update(selected_item.price.value)
         window["store_item_quantity"].update(selected_item.quantity.value)
         window["store_item_weight"].update(selected_item.weight.value)
+        # # Safe update for locked — only if attribute exists and has a numeric value
+        # if hasattr(selected_item, "locked") and getattr(selected_item, "locked") is not None:
+        #   try:
+        #     window["store_item_locked"].update(selected_item.locked.value)
+        #   except Exception:
+        #     window["store_item_locked"].update("")
+        # else:
+        #   window["store_item_locked"].update("")
       else:
         window["store_item_price"].update("")
         window["store_item_quantity"].update("")
         window["store_item_weight"].update("")
+        # window["store_item_locked"].update("")
     if event.startswith("store_tab_"):
-      category_quantity_disabled = bool(item_type in ["sight", "optic", "skin", "weapon", "feeder_bait"])
+      # disable quantity for categories that don't have it
+      category_quantity_disabled = bool(item_type in ["trophy_holder", "sight", "optic", "skin", "weapon", "feeder_bait"])
       window["store_item_quantity"].update(disabled=category_quantity_disabled)
       window["store_bulk_quantity"].update(disabled=category_quantity_disabled)
-      category_weight_disabled = bool(item_type in ["skin", "feeder_bait"])
+      # disable weight for categories without weight
+      category_weight_disabled = bool(item_type in ["trophy_holder", "skin", "feeder_bait"])
       window["store_item_weight"].update(disabled=category_weight_disabled)
       window["store_bulk_weight"].update(disabled=category_weight_disabled)
+      # # disable locked for feeder bait (Lure objects don't have locked)
+      # category_locked_disabled = bool(item_type == "feeder_bait")
+      # window["store_item_locked"].update(disabled=category_locked_disabled)
+      # window["store_bulk_locked"].update(disabled=category_locked_disabled)
 
 def add_mod(window: sg.Window, values: dict) -> dict:
   selected_item = get_selected_item(window, values)
@@ -275,6 +384,15 @@ def add_mod(window: sg.Window, values: dict) -> dict:
       "invalid": "Provide a valid item weight"
     }
 
+  # try:
+  #   item_locked = int(values["store_item_locked"])
+  #   if not 0 <= item_locked <= 9:
+  #     raise ValueError
+  # except ValueError:
+  #   return {
+  #     "invalid": "Provide a valid item locked value (0-9)"
+  #   }
+
   return {
     "key": f"modify_store_{selected_item.name}",
     "invalid": None,
@@ -286,6 +404,7 @@ def add_mod(window: sg.Window, values: dict) -> dict:
       "price": item_price,
       "quantity": item_quantity,
       "weight": item_weight,
+      # "locked": item_locked,
     }
   }
 
@@ -317,6 +436,18 @@ def add_mod_group(window: sg.Window, values: dict) -> dict:
       "invalid": "Provide a valid bulk weight"
     }
 
+  # if not values["store_bulk_locked"]:
+  #   bulk_locked = -1
+  # else:
+  #   try:
+  #     bulk_locked = int(values["store_bulk_locked"])
+  #     if not 0 <= bulk_locked <= 9:
+  #       raise ValueError
+  #   except ValueError:
+  #     return {
+  #       "invalid": "Provide a valid bulk locked value (0-9)"
+  #     }
+
   item_type = get_selected_category(window)
   return {
     "key": f"modify_store_{item_type}",
@@ -328,6 +459,7 @@ def add_mod_group(window: sg.Window, values: dict) -> dict:
       "free_price": bulk_free_price,
       "bulk_quantity": bulk_quantity,
       "bulk_weight": bulk_weight,
+      # "bulk_locked": bulk_locked,
     }
   }
 
@@ -341,7 +473,9 @@ def format_options(options: dict) -> str:
       details.append(f"{bulk_quantity} quantity")
     if (bulk_weight := options.get("bulk_weight", -1)) >= 0:
       details.append(f"{bulk_weight} kg")
-    return f"Modify Store Category: {mods.title_from_key(options["type"])} ({' ,'.join(details)})"
+    # if (bulk_locked := options.get("bulk_locked", -1)) >= 0:
+    #   details.append(f"locked {bulk_locked}")
+    return f"Modify Store Category: {mods.title_from_key(options['type'])} ({' ,'.join(details)})"
   else:  # single item
     display_name = options.get("display_name", options["name"])  # diplay_name added in 2.2.2
     selected_item = next((i for i in ALL_STORE_ITEMS[options["type"]] if options["name"] == i.name), None)
@@ -349,12 +483,14 @@ def format_options(options: dict) -> str:
       selected_item = match_old_item(options)  # try to match options to a StoreItem
     if selected_item:
       display_name = selected_item.display_name
-    details.append(f"${options["price"]}")
+    details.append(f"${options['price']}")
     if options["quantity"]:
-      details.append(f"{options["quantity"]} quantity")
+      details.append(f"{options['quantity']} quantity")
     if (weight := options.get("weight", -1)) >= 0:
       details.append(f"{weight} kg")
-    return f"Modify Store: {mods.title_from_key(options["type"])} - {display_name} ({' ,'.join(details)})"
+    # if (locked := options.get("locked", -1)) >= 0:
+    #   details.append(f"locked {locked}")
+    return f"Modify Store: {mods.title_from_key(options['type'])} - {display_name} ({' ,'.join(details)})"
 
 def handle_key(mod_key: str) -> bool:
   return mod_key.startswith("modify_store")
@@ -374,12 +510,15 @@ def process(options: dict) -> None:
         updates.append({"offset": selected_item.quantity.offset, "value": options["quantity"]})
       if options["weight"] >= 0 and selected_item.weight.offset > 0:
         updates.append({"offset": selected_item.weight.offset, "value": options["weight"]})
+      # if "locked" in options and selected_item.locked.offset > 0:
+      #   updates.append({"offset": selected_item.locked.offset, "value": options["locked"]})
 
   if "bulk_quantity" in options:  # category
     discount = options["discount"]
     free_price = options["free_price"]
     bulk_quantity = options["bulk_quantity"]
     bulk_weight = options["bulk_weight"]
+    # bulk_locked = options.get("bulk_locked", -1)
     for item in item_list:
       if discount > 0:
         updates.append({"offset": item.price.offset, "value": 1 - discount / 100, "transform": "multiply"})
@@ -389,6 +528,8 @@ def process(options: dict) -> None:
         updates.append({"offset": item.quantity.offset, "value": bulk_quantity})
       if bulk_weight >= 0 and item.weight.offset > 0:
         updates.append({"offset": item.weight.offset, "value": bulk_weight})
+      # if bulk_locked >= 0 and item.locked.offset > 0:
+      #   updates.append({"offset": item.locked.offset, "value": bulk_locked})
 
   mods.apply_updates_to_file(LURE_FILE if options["type"] == "feeder_bait" else EQUIPMENT_FILE, updates)
 
@@ -451,7 +592,7 @@ def handle_update(mod_key: str, mod_options: dict, version: str) -> tuple[str, d
     if not selected_item:
       selected_item = match_old_item(mod_options)  # Try to parse the old item names/offsets to match with a StoreItem object
     if not selected_item:
-      raise ValueError(f"Unable to match item \"{mod_options["name"]}\"")
+      raise ValueError(f"Unable to match item \"{mod_options['name']}\"")
     updated_mod_key = f"modify_store_{selected_item.name}"
     updated_mod_options = {
       "type": selected_item.type,
@@ -461,10 +602,11 @@ def handle_update(mod_key: str, mod_options: dict, version: str) -> tuple[str, d
       "price": mod_options["price"],
       "quantity": mod_options.get("quantity", 0),
       "weight": mod_options.get("weight", -1),
+      # "locked": mod_options.get("locked", selected_item.locked.value if getattr(selected_item, "locked", None) else -1),
     }
 
   elif "free_price" in mod_options:  # category
-    updated_mod_key = f"modify_store_{mod_options["type"]}"
+    updated_mod_key = f"modify_store_{mod_options['type']}"
     updated_mod_options = {
       "type": mod_options["type"],
       "file": LURE_FILE if mod_options["type"] == "feeder_bait" else EQUIPMENT_FILE,
@@ -472,6 +614,7 @@ def handle_update(mod_key: str, mod_options: dict, version: str) -> tuple[str, d
       "free_price": mod_options["free_price"],
       "bulk_quantity": mod_options.get("bulk_quantity", 0),  # some pre-2.1.0 version didn't have "bulk_quantity"
       "bulk_weight": mod_options.get("bulk_weight", -1),  # added in 2.2.7
+      # "bulk_locked": mod_options.get("bulk_locked", -1),
     }
 
   else:

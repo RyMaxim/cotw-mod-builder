@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "modbuilder-revived"
-version = "2.3.0"
+version = "2.4.0"
 description = "A tool that makes it easy to customize and create mods for theHunter: Call of the Wild (COTW)"
 authors = [{ name = "Ryan Maxim" }]
 readme = "README.md"

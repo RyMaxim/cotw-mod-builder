@@ -265,7 +265,7 @@ def load_weapon_ui_data() -> dict[str, dict]:
 
 def load_weapon_magazine_data() -> dict[str, WeaponMagazine]:
     equipment = mods.open_rtpc(mods.APP_DIR_PATH / "org" / mods.EQUIPMENT_DATA_FILE)
-    weapons_table = equipment.child_table[6].child_table
+    weapons_table = equipment.child_table[7].child_table
     weapon_magazine_data = {}
     for weapon_data in weapons_table:
         magazine = WeaponMagazine(weapon_data)

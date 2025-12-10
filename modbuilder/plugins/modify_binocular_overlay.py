@@ -12,7 +12,7 @@ DEBUG = False
 NAME = "Modify Binocular Overlay"
 DESCRIPTION = "Modify the binocular overlay."
 OVERLAYS_PATH = mods.APP_DIR_PATH / "org/modded/binocular_overlay"
-OVERLAY_FILE_NAME = "hud_i469.ddsc"
+OVERLAY_FILE_NAME = "hud_i428.ddsc"
 
 
 def get_option_elements() -> sg.Column:

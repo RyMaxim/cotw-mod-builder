@@ -102,22 +102,29 @@ def update_values_at_coordinates(options: dict) -> list[dict]:
       "transform": "multiply",
     },
     {
-      # reward_achievement_small
+      # reward_mission_mm20130_pop_haggis_cash_medium
       "coordinates": "C26",
       "sheet": "custom_rewards",
       "value": xp_reward_multiplier,
       "transform": "multiply",
     },
     {
+      # reward_achievement_small
+      "coordinates": "C28",
+      "sheet": "custom_rewards",
+      "value": xp_reward_multiplier,
+      "transform": "multiply",
+    },
+    {
       # reward_achievement_medium
-      "coordinates": "C27",
+      "coordinates": "C29",
       "sheet": "custom_rewards",
       "value": xp_reward_multiplier,
       "transform": "multiply",
     },
     {
       # reward_achievement_large
-      "coordinates": "C28",
+      "coordinates": "C30",
       "sheet": "custom_rewards",
       "value": xp_reward_multiplier,
       "transform": "multiply",

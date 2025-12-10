@@ -66,43 +66,50 @@ def update_values_at_coordinates(options: dict) -> List[dict]:
       "value": cash_reward_multiplier
     },
     {
+      # reward_mission_mm20130_pop_haggis_cash_medium
+      "coordinates": "B26",
+      "sheet": "custom_rewards",
+      "transform": "multiply",
+      "value": cash_reward_multiplier
+    },
+    {
       # reward_competition_bronze
-      "coordinates": "B31",
-      "sheet": "custom_rewards",
-      "transform": "multiply",
-      "value": cash_reward_multiplier
-    },
-    {
-      # reward_competition_silver
-      "coordinates": "B32",
-      "sheet": "custom_rewards",
-      "transform": "multiply",
-      "value": cash_reward_multiplier
-    },
-    {
-      # reward_competition_gold
       "coordinates": "B33",
       "sheet": "custom_rewards",
       "transform": "multiply",
       "value": cash_reward_multiplier
     },
     {
-      # reward_halloween_200
+      # reward_competition_silver
+      "coordinates": "B34",
+      "sheet": "custom_rewards",
+      "transform": "multiply",
+      "value": cash_reward_multiplier
+    },
+    {
+      # reward_competition_gold
       "coordinates": "B35",
       "sheet": "custom_rewards",
       "transform": "multiply",
       "value": cash_reward_multiplier
     },
     {
+      # reward_halloween_200
+      "coordinates": "B37",
+      "sheet": "custom_rewards",
+      "transform": "multiply",
+      "value": cash_reward_multiplier
+    },
+    {
       # reward_halloween_500
-      "coordinates": "B36",
+      "coordinates": "B38",
       "sheet": "custom_rewards",
       "transform": "multiply",
       "value": cash_reward_multiplier
     },
     {
       # reward_halloween_1000
-      "coordinates": "B37",
+      "coordinates": "B39",
       "sheet": "custom_rewards",
       "transform": "multiply",
       "value": cash_reward_multiplier

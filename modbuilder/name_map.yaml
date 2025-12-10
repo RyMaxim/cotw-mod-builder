@@ -1196,6 +1196,11 @@ weapon:
     type: Shotgun
   shotgun_sa_10ga: *sa_shotgun_10ga  # tuning file
 
+  sa_shotgun_12ga_type2: &sa_shotgun_12ga_type2
+    name: Benelhag 12G
+    type: Shotgun
+
+
   sa_shotgun_20ga: &sa_shotgun_20ga  # equipment_data.bin
     name: Nordin 20SA
     type: Shotgun
@@ -1282,7 +1287,7 @@ structure:
     name: Water Layout Blind  # Incognito Deluxe Water Layout Blind
 
   waterfowlblind:
-    name: Waterfowl Blind  # Incognito Deluxe Waterforl Blind
+    name: Waterfowl Blind  # Incognito Deluxe Waterfowl Blind
     style:
       "01": Timber
       "02": Marsh

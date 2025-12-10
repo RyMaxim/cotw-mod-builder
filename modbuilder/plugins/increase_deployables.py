@@ -14,6 +14,12 @@ OPTIONS = [
   { "name": "Deployable Multiplier", "min": 2, "max": 20, "default": 1, "increment": 1 }
 ]
 
+TROPHY_LODGE_IDS = [
+  5, # Spring Creek Manor
+  7, # Saseka Safari Lodge
+  15, # Layton Laykes Trophy Cabin
+]
+
 def format_options(options: dict) -> str:
   return f"Increase Deployables ({int(options['deployable_multiplier'])}x)"
 
@@ -85,6 +91,9 @@ def open_reserve(filename: Path) -> tuple[RtpcNode, bytearray]:
 
 def update_all_deployables(source: Path, multiply: int) -> None:
   for file in list(source.glob("reserve_*.bin")):
+    reserve_id = int(file.stem.split("_")[1])
+    if reserve_id in TROPHY_LODGE_IDS:
+      continue
     root, data = open_reserve(file)
     update_reserve_deployables(root, data, multiply)
     save_file(file, data)
