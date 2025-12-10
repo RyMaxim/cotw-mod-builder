@@ -633,17 +633,25 @@ def calculate_modified_stats(ammo: Ammo, modifiers: dict) -> dict:
 def calculate_modified_stat(ammo: Ammo, stat: str, modifier: float | None, ui_data: bool = False) -> float:
   if modifier is None:
     return None
+
   if ui_data:
     base_value = ammo.ui_data[stat]
   else:
     base_value = getattr(ammo.stats, stat).value
-  if stat == "penetration": # penetration uses an inverse formula
-    return base_value * (1 - modifier / 100)
-  if stat == "max_range": # max_range is an exact value
-    return int(modifier)
+
+  if stat == "penetration":
+    # penetration in tuning files uses an inverse formula with a range of 0.0 - 1.0
+    # penetration UI value uses the standard _pct_signed() formula
+    if not ui_data:
+      return base_value * (1 - modifier / 100)
+
+  if stat == "max_range": # max_range is an exact value. 0 = use ammo default
+    return int(modifier) if modifier > 0 else ammo.stats.max_range.value
+
   if stat == "projectiles": # projectiles is a flat modifier. Pellet ammos only.
     projectiles = int(base_value + int(modifier) if ammo._has_pellets() else base_value)
     return min(255, max(0, projectiles))  # ammo breaks with 256+ pellets
+
   # other stats use a signed percent modifier so +% always increases the result, even if base < 0
   return _pct_signed(base_value, modifier)
 
@@ -651,10 +659,13 @@ def calculate_stat_modifier(ammo: Ammo, stat: str, value: float) -> float:
   if stat == "penetration": # penetration uses an inverse formula
     pen_ratio = _safe_ratio(value, ammo.stats.penetration.value)
     return 0 if pen_ratio is None else (1 - pen_ratio) * 100
+
   if stat == "max_range": # max_range is an exact value
     return value
+
   if stat == "projectiles": # projectiles is a flat modifier. Pellet ammos only
     return value - ammo.stats.projectiles.value if ammo._has_pellets() else 0
+
   # other stats use signed percent change that moves 'up' even if base_value < 0
   base_value = getattr(ammo.stats, stat).value
   return _pct_modified_signed(value, base_value)

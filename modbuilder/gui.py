@@ -4,8 +4,10 @@ import textwrap
 import traceback
 import webbrowser
 from importlib.metadata import version
+from pathlib import Path
 
 import FreeSimpleGUI as sg
+from tkinter import TclError
 import requests
 from deepmerge import always_merger
 from packaging.version import Version as package_version
@@ -73,6 +75,30 @@ def _show_update_popup(release_data: dict) -> None:
       break
   window.close()
 
+def _warn_user_onedrive_folder() -> None:
+  parts = [p.lower() for p in mods.APP_DIR_PATH.parts]
+  if "onedrive" in parts:
+    idx = parts.index("onedrive")
+    recommended = Path(*mods.APP_DIR_PATH.parts[:idx])
+    onedrive_warning = (
+      'Mod Builder has detected that it is running from inside a OneDrive-synced folder. This can cause errors and unexpected behavior.\n'
+      '\n'
+      'Please close this application and move the entire "modbuilder" folder to a non-OneDrive location before continuing.\n\n'
+      f'Recommended path: {recommended}'
+    )
+    sg.PopupOK(onedrive_warning, icon=logo.value, title="OneDrive folder detected", font=SMALL_FONT)
+
+def _warn_user_permissions_error() -> None:
+  permissions_warning = (
+    'Failed to load mods into the "dropzone" folder.\n'
+    '> PermissionError: Access is denied\n'
+    '\n'
+    'Please close this application and run it as Administrator:\n'
+    ' - Right-click "modbuilder.exe"\n'
+    ' - Choose "Run as Administrator"'
+  )
+  sg.PopupOK(permissions_warning, icon=logo.value, title="Administrator permissions required", font=SMALL_FONT)
+
 def _show_popup_message(message: str) -> str:
   sg.popup_quick_message(message, font="_ 28", background_color="brown")
 
@@ -91,7 +117,7 @@ def _show_error_window(error: Exception, mod_key: str = None, mod_options: dict 
     [sg.Button("Copy to Clipboard", key="-CLIPBOARD-"), sg.Push(), sg.Button("Open NexusMods", key="-NEXUSMODS-")],
   ]
 
-  window = sg.Window("UNEXPECTED ERROR", layout, modal=True, size=(600, 500), icon=logo.value)
+  window = sg.Window("🚨 UNEXPECTED ERROR", layout, modal=True, size=(600, 500), icon=logo.value)
   while True:
     event, _values = window.read()
     if event in (sg.WINDOW_CLOSED, "Close"):
@@ -478,6 +504,7 @@ def main() -> None:
   window = sg.Window("COTW: Mod Builder - Revived", layout, resizable=True, font=DEFAULT_FONT, icon=logo.value, size=(1300, 800), finalize=True)
   _get_mods(window)
   _check_for_update()
+  _warn_user_onedrive_folder()
 
   while True:
     event, values = window.read()
@@ -603,6 +630,16 @@ def main() -> None:
             window[f"{preset_mod_key}__{option['name']}"].update(set_to_index = option["values"])
       else:
         mods.delegate_event(event, window, values)
+    except PermissionError as exc:
+      # catch "WinError 5: Access is denied" if Windows is preventing the user from deleting the "dropzone" folder
+      if getattr(exc, "winerror", None) == 5:
+        _warn_user_permissions_error()
+      raise
+    except TclError as exc:
+      # catch and ignore a "widget is gone" error if the user hits X to close the window while mods are loading
+      if "invalid command name" in str(exc):
+          return
+      raise
     except Exception:
       _show_error_window(traceback.format_exc())
 
