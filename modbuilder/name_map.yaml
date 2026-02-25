@@ -1247,8 +1247,20 @@ structure:
     name: Box Feeder
     type: Feeder
 
-  bait_feeder_hanging:
+  bait_feeder_hanging_01:
+    name: Carcass Feeder
+    type: Feeder
+
+  bait_feeder_hanging_02:
     name: Post Feeder
+    type: Feeder
+
+  bait_feeder_ribcage:
+    name: Scent Tube Feeder
+    type: Feeder
+
+  bait_feeder_salt_lick:
+    name: Mineral Lick Feeder
     type: Feeder
 
   groundblind:
@@ -1587,3 +1599,15 @@ feeder_bait:
   bait_site_box_corn:
     name: Multigrain Flake Mix
     type: Box Feeder
+
+  bait_site_hamburger_meat_01:
+    name: Scented Meat Scraps
+    type: Scent Tube Feeder
+
+  bait_site_meat_01:
+    name: Carcass
+    type: Carcass Feeder
+
+  bait_site_salt_block:
+    name: Mineral Block
+    type: Mineral Lick Feeder

@@ -12,13 +12,13 @@ DESCRIPTION = "Increases the number of animals that get populated when loading a
 FILE = "settings/hp_settings/reserve_*.bin"
 WARNING = "Increasing the population too much can cause the game to crash, especially when used in combination with Increase Render Distance. I personally do not go beyond a 3.0 multiplier."
 OPTIONS = [
-  { "name": "Population Multiplier", "min": 1.1, "max": 8, "default": 1, "increment": 0.1 }
+  { "name": "Population Multiplier", "min": 0.1, "max": 8, "default": 1, "increment": 0.1 }
 ]
 
 TROPHY_LODGE_IDS = [
   5, # Spring Creek Manor
   7, # Saseka Safari Lodge
-  15, # Layton Laykes Trophy Cabin
+  15, # Layton Lakes Trophy Cabin
 ]
 
 def format_options(options: dict) -> str:

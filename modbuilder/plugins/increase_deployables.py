@@ -1,6 +1,7 @@
 from deca.ff_rtpc import rtpc_from_binary, RtpcProperty, RtpcNode
 from pathlib import Path
 from modbuilder import mods
+from modbuilder.mods import StatWithOffset
 from enum import Enum
 from modbuilder.logging_config import get_logger
 
@@ -11,66 +12,63 @@ NAME = "Increase Deployables"
 DESCRIPTION = "Increases the number of deployable structures you can place on all reserves."
 FILE = "settings/hp_settings/reserve_*.bin"
 OPTIONS = [
-  { "name": "Deployable Multiplier", "min": 2, "max": 20, "default": 1, "increment": 1 }
+  { "name": "Deployable Multiplier", "min": 0.1, "max": 20, "default": 1, "increment": 0.1 }
 ]
 
 TROPHY_LODGE_IDS = [
   5, # Spring Creek Manor
   7, # Saseka Safari Lodge
-  15, # Layton Laykes Trophy Cabin
+  15, # Layton Lakes Trophy Cabin
 ]
 
 def format_options(options: dict) -> str:
   return f"Increase Deployables ({int(options['deployable_multiplier'])}x)"
 
 class Deployable(str, Enum):
-  LAYOUTBLIND = "layoutblind"
-  TREESTAND = "treestand"
-  TENT = "tent"
-  TRIPOD = "tripodstand"
-  GROUNDBLIND = "groundblind"
   DECOY = "decoy"
   BAIT_FEEDER = "bait_feeder"
+  GROUNDBLIND = "groundblind"
+  LAYOUTBLIND = "layoutblind"
+  TENT = "tent"
+  TREESTAND = "treestand"
+  TRIPOD = "tripodstand"
+  WATERFOWLBLIND = "waterfowlblind"
 
-class DeployableValue:
-  def __init__(self, value: int, offset: int) -> None:
-    self.value = value
-    self.offset = offset
+def _is_deployable_prop(value: str) -> bool:
+  return any(d.value in value for d in Deployable)
 
-  def __repr__(self) -> str:
-    return f"{self.value:} ({self.offset}))"
-
-def is_deployable_prop(value: str) -> bool:
-  return any(x in value for x in (
-    Deployable.LAYOUTBLIND,
-    Deployable.TREESTAND,
-    Deployable.TENT,
-    Deployable.TRIPOD,
-    Deployable.GROUNDBLIND,
-    Deployable.DECOY,
-    Deployable.BAIT_FEEDER,
-  ))
-
-def is_deployable(props: list[RtpcProperty]) -> bool:
+def _is_deployable(props: list[RtpcProperty]) -> bool:
   for prop in props:
-    if isinstance(prop.data, bytes) and is_deployable_prop(prop.data.decode("utf-8")):
+    if isinstance(prop.data, bytes) and _is_deployable_prop(prop.data.decode("utf-8")):
       return True
   return False
+
+def _get_deployable_max_count(deployable: RtpcNode) -> StatWithOffset:
+  for prop in deployable.prop_table:
+    if prop.name_hash == 2415882446:  # 0x8fff70ce
+      return StatWithOffset(prop)
 
 def update_uint(data: bytearray, offset: int, new_value: int) -> None:
     value_bytes = new_value.to_bytes(4, byteorder='little')
     for i in range(0, len(value_bytes)):
         data[offset + i] = value_bytes[i]
 
-def update_reserve_deployables(root: RtpcNode, f_bytes: bytearray, multiply: int) -> None:
-  for data_table in root.child_table:
-    if data_table.name_hash == 3050727908:  # 0xb5d669e4
-      deployables = data_table.child_table
+def _get_world_items_tables(root: RtpcNode) -> RtpcNode:
+  for table in root.child_table:
+    if table.name_hash == 3050727908:  # 0xb5d669e4
+      return table.child_table
+  return None
+
+def update_reserve_deployables(root: RtpcNode, f_bytes: bytearray, multiply: int, reserve_id: int) -> None:
+  world_items_tables = _get_world_items_tables(root)
+  if not world_items_tables:
+    raise ValueError(f"Unable to parse world items data table for reserve {reserve_id}")
   deployable_values = []
-  for deployable in deployables:
-    if is_deployable(deployable.prop_table):
-      prop = deployable.prop_table[-1]
-      deployable_values.append(DeployableValue(prop.data, prop.data_pos))
+  for table in world_items_tables:
+    if _is_deployable(table.prop_table):
+      max_count = _get_deployable_max_count(table)
+      if max_count:
+        deployable_values.append(max_count)
 
   try:
     for deployable_value in deployable_values:
@@ -95,7 +93,7 @@ def update_all_deployables(source: Path, multiply: int) -> None:
     if reserve_id in TROPHY_LODGE_IDS:
       continue
     root, data = open_reserve(file)
-    update_reserve_deployables(root, data, multiply)
+    update_reserve_deployables(root, data, multiply, reserve_id)
     save_file(file, data)
 
 def process(options: dict) -> None:
