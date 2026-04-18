@@ -13,7 +13,7 @@
 
 ammo:
 
-  ### Bows
+  ### Bow
 
   jp_bow_arrow_300gr_01:
     name: Regular 300g Arrow
@@ -87,7 +87,7 @@ ammo:
     name: Longbow 700g Tracer Arrow
     type: Bow
 
-  ### Handguns
+  ### Handgun
 
   10mm_fn_01:
     name: 10mm Hard Cast Flat Nose
@@ -149,7 +149,23 @@ ammo:
     name: _PLACEHOLDER .50 Jacketed Hollow-Point  # not available in-game
     type: Handgun
 
-  ### Rifles
+  ### Rifle
+
+  17mr_hp_01:
+    name: .17HMR Polymer-Tip
+    type: Rifle
+
+  17mr_jhp_01:
+    name: .17HMR Full Metal Jacket
+    type: Rifle
+
+  22_250_pt_01:
+    name: .22-250 Polymer-Tip
+    type: Rifle
+
+  22_250_sp_01:
+    name: .22-250 Soft-Point
+    type: Rifle
 
   22h_pt_01:
     name: .22H Polymer-Tip
@@ -175,12 +191,12 @@ ammo:
     name: .22 Mag Jacketed Hollow-Point
     type: Rifle
 
-  22_250_pt_01:
-    name: .22-250 Polymer-Tip
+  25_06_pt_01:
+    name: .25-06 Polymer-Tip
     type: Rifle
 
-  22_250_sp_01:
-    name: .22-250 Soft-Point
+  25_06_sp_01:
+    name: .25-06 Soft-Point
     type: Rifle
 
   223_pt_01:
@@ -327,6 +343,14 @@ ammo:
     name: .50 Polymer-Tip Sabot
     type: Rifle
 
+  500_sb_01:
+    name: .500 Jeffery Solid
+    type: Rifle
+
+  500_sp_01:
+    name: .500 Jeffery Soft-Point
+    type: Rifle
+
   "577_450_01":
     name: .577/450 Black Powder
     type: Rifle
@@ -371,7 +395,7 @@ ammo:
     name: 9.3x74R Soft-Point
     type: Rifle
 
-  ### Shotguns
+  ### Shotgun
 
   10ga_bird_01:
     name: 10 GA Brass Birdshot
@@ -906,6 +930,10 @@ weapon:
     type: Rifle
   airrifle_45: *ba_airrifle_45  # tuning file
 
+  ba_rifle_17mr:
+    name: Joneros .17HMR
+    type: Rifle
+
   ba_rifle_22_250: &ba_rifle_22_250  # equipment_data.bin
     name: Zagan Varminter .22-250
     type: Rifle
@@ -918,6 +946,10 @@ weapon:
       "01": Kullman .22H Wasp
       "02": Kullman .22H Yellowjacket
       "03": Kullman .22H Hornet
+
+  ba_rifle_25_06:
+    name: Alis Precision Shot .25-06
+    type: Rifle
 
   ba_rifle_223: &ba_rifle_223  # equipment_data.bin
     name: .223 Docent
@@ -987,6 +1019,10 @@ weapon:
     name: Johansson .450
     type: Rifle
   ba_rifles_450: *ba_rifle_450  # tuning file
+
+  ba_rifle_500:
+    name: Richardsson .500
+    type: Rifle
 
   ba_rifle_6_5mm: &ba_rifle_6_5mm  # equipment_data.bin
     name: Martensson 6.5mm
@@ -1190,6 +1226,11 @@ weapon:
       "02": Couso Model 1897 Soldado
       "03": Couso Model 1897 Ranchero
   shotgun_1897_pa: *pa_shotgun_1897_16ga  # tuning file
+
+  rifle_br_combination: &rifle_br_combination # equipment_data.bin
+    name: Cassidy Combination Shotgun
+    type: Shotgun
+  rifle_br_combination_shotgun: *rifle_br_combination # tuning file
 
   sa_shotgun_10ga: &sa_shotgun_10ga  # equipment_data.bin
     name: Strandberg 10SA

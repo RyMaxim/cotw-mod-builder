@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "modbuilder-revived"
-version = "2.5.0"
+version = "2.6.0"
 description = "A tool that makes it easy to customize and create mods for theHunter: Call of the Wild (COTW)"
 authors = [{ name = "Ryan Maxim" }]
 readme = "README.md"
@@ -27,6 +27,13 @@ dev = [
   "pyinstaller>=6.15",
 ]
 
+[project.urls]
+Homepage = "https://github.com/RyMaxim/cotw-mod-builder"
+Repository = "https://github.com/RyMaxim/cotw-mod-builder"
+Releases = "https://github.com/RyMaxim/cotw-mod-builder/releases"
+NexusMods = "https://www.nexusmods.com/thehuntercallofthewild/mods/410"
+NexusModsReleases = "https://www.nexusmods.com/thehuntercallofthewild/mods/410?tab=files"
+
 [project.gui-scripts]
 modbuilder = "modbuilder.gui:main"
 
@@ -48,6 +55,13 @@ platform.linux.scripts = [
   'build=sh ./scripts/build.sh',
   'pack=sh ./scripts/pack.sh',
 ]
+
+[tool.hatch.envs.dev]
+template = "default"
+description = "Run Mod Builder with asset version checks disabled"
+
+[tool.hatch.envs.dev.env-vars]
+MODBUILDER_SKIP_BUNDLE_VERSION_CHECK = "1"
 
 [tool.hatch.build.targets.wheel]
 packages = ["modbuilder", "deca"]

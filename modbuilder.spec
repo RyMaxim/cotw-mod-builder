@@ -7,6 +7,7 @@ REPO_ROOT = os.path.abspath(os.getcwd())
 SCRIPT_PATH = os.path.join(REPO_ROOT, "modbuilder.py")
 
 datas = [
+    # "/org" folder is an externally-provided asset bundle. Required for packaged releases.
     (os.path.join(REPO_ROOT, "modbuilder/org"), "org"),
     (os.path.join(REPO_ROOT, "modbuilder/plugins/*.py"), "plugins"),
     (os.path.join(REPO_ROOT, "modbuilder/saves"), "saves"),

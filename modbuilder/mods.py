@@ -17,25 +17,26 @@ from deca.ff_adf import Adf, AdfValue
 from deca.ff_rtpc import RtpcNode, RtpcProperty, rtpc_from_binary
 from deca.ff_sarc import EntrySarc, FileSarc
 from deca.file import ArchiveFile
-from modbuilder import adf_profile, mods2
+from modbuilder import adf_profile, assets, mods2
 from modbuilder.logging_config import get_logger
 
 logger = get_logger(__name__)
 
 __version__ = version("modbuilder-revived")
 
-APP_DIR_PATH = Path(getattr(sys, '_MEIPASS', Path(__file__).resolve().parent))
+APP_DIR_PATH = assets.get_app_dir_path()
+ORG_DIR_PATH = assets.get_org_dir()
 MOD_PATH = APP_DIR_PATH / "mod/dropzone"
-LOOKUP_PATH = APP_DIR_PATH / "org/lookups"
+LOOKUP_PATH = ORG_DIR_PATH / "lookups"
 PLUGINS_FOLDER = "plugins"
 GLOBAL_SRC_PATH = "gdc/global.gdcc"
-GLOBAL_PATH = APP_DIR_PATH / "org" / GLOBAL_SRC_PATH
+GLOBAL_PATH = ORG_DIR_PATH / GLOBAL_SRC_PATH
 ELMER_MOVEMENT_LOCAL_SRC_PATH = "editor/entities/hp_characters/main_characters/local_player_character.ee"
 ELMER_MOVEMENT_NETWORK_SRC_PATH = "editor/entities/hp_characters/main_characters/network_player_character.ee"
-ELMER_MOVEMENT_LOCAL_PATH = APP_DIR_PATH / "org" / ELMER_MOVEMENT_LOCAL_SRC_PATH
-ELMER_MOVEMENT_NETWORK_PATH = APP_DIR_PATH / "org" / ELMER_MOVEMENT_NETWORK_SRC_PATH
+ELMER_MOVEMENT_LOCAL_PATH = ORG_DIR_PATH / ELMER_MOVEMENT_LOCAL_SRC_PATH
+ELMER_MOVEMENT_NETWORK_PATH = ORG_DIR_PATH / ELMER_MOVEMENT_NETWORK_SRC_PATH
 GLOBAL_ANIMALS_SRC_PATH = "global/global_animal_types.bl"
-GLOBAL_ANIMALS_PATH = APP_DIR_PATH / "org" / GLOBAL_ANIMALS_SRC_PATH
+GLOBAL_ANIMALS_PATH = ORG_DIR_PATH / GLOBAL_ANIMALS_SRC_PATH
 GAME_PATH_FILE = APP_DIR_PATH / "game_path.txt"
 EQUIPMENT_DATA_FILE = "settings/hp_settings/equipment_data.bin"
 EQUIPMENT_UI_FILE = "settings/hp_settings/equipment_stats_ui.bin"
@@ -97,7 +98,7 @@ def load_global_files() -> None:
 
 def load_equipment_ui_data() -> Adf:
   global EQUIPMENT_UI_DATA
-  EQUIPMENT_UI_DATA = mods2.deserialize_adf(APP_DIR_PATH / "org" / EQUIPMENT_UI_FILE)
+  EQUIPMENT_UI_DATA = mods2.deserialize_adf(ORG_DIR_PATH / EQUIPMENT_UI_FILE)
 
 def get_mods() -> None:
   mod_filenames = _get_mod_filenames()
@@ -208,7 +209,7 @@ def clear_mod() -> None:
     shutil.rmtree(path)
 
 def get_relative_path(path: str) -> str:
-  return os.path.relpath(path, APP_DIR_PATH / "org").replace("\\", "/")
+  return os.path.relpath(path, ORG_DIR_PATH).replace("\\", "/")
 
 def copy_file(src_path: Path, dest_path: Path) -> None:
   if not dest_path.exists():
@@ -216,14 +217,13 @@ def copy_file(src_path: Path, dest_path: Path) -> None:
     shutil.copy(src_path, dest_path)
 
 def copy_file_to_mod(src_filename: str) -> None:
-  dest_path = APP_DIR_PATH / "mod/dropzone" / src_filename
-  src_path = APP_DIR_PATH / "org" / src_filename
+  dest_path = MOD_PATH / src_filename
+  src_path = ORG_DIR_PATH / src_filename
   copy_file(src_path, dest_path)
 
 def copy_glob_to_mod(src_filename: str) -> list[str]:
-  org_basepath = APP_DIR_PATH / "org"
   files = []
-  for file in list(org_basepath.glob(src_filename)):
+  for file in list(ORG_DIR_PATH.glob(src_filename)):
     file = str(Path(f"{Path(src_filename).parent}/{file.name}"))
     copy_file_to_mod(file)
     files.append(file.replace("\\", "/"))
@@ -242,10 +242,10 @@ def copy_all_files_to_mod(filenames: list[str]) -> list[str]:
   return filenames
 
 def get_org_file(src_filename: str) -> Path:
-  return APP_DIR_PATH / "org" / src_filename
+  return ORG_DIR_PATH / src_filename
 
 def get_modded_file(src_filename: str) -> Path:
-  return APP_DIR_PATH / "mod/dropzone" / src_filename
+  return MOD_PATH / src_filename
 
 def read_file_at_offset(src_filename: str, offset: int, format: str) -> any:
   src_path = get_org_file(src_filename)
@@ -398,8 +398,8 @@ def is_file_in_bundle(filename: str, lookup: dict) -> bool:
   return filename in lookup.keys()
 
 def merge_into_archive(filename: str, merge_path: str, merge_lookup: dict, delete_src: bool = False) -> None:
-  src_path = APP_DIR_PATH / "mod/dropzone" / filename
-  mod_merge_path = APP_DIR_PATH / "mod/dropzone" / merge_path
+  src_path = MOD_PATH / filename
+  mod_merge_path = MOD_PATH / merge_path
   copy_files_to_mod(merge_path)
   filename_bytes = bytearray(src_path.read_bytes())
   merge_bytes = bytearray(mod_merge_path.read_bytes())
@@ -410,8 +410,8 @@ def merge_into_archive(filename: str, merge_path: str, merge_lookup: dict, delet
     src_path.unlink()
 
 def recreate_archive(changed_filenames: list[str], archive_path: str) -> None:
-  org_archive_path = APP_DIR_PATH / "org" / archive_path
-  new_archive_path = APP_DIR_PATH / "mod/dropzone" / archive_path
+  org_archive_path =ORG_DIR_PATH / archive_path
+  new_archive_path = MOD_PATH / archive_path
 
   sarc_file = FileSarc()
   sarc_file.header_deserialize(org_archive_path.open("rb"))
@@ -420,7 +420,7 @@ def recreate_archive(changed_filenames: list[str], archive_path: str) -> None:
   for entry in sarc_file.entries:
     file = entry.v_path.decode("utf-8")
     if file in changed_filenames:
-      entry.length = (APP_DIR_PATH / "mod/dropzone" / file).stat().st_size
+      entry.length = (MOD_PATH / file).stat().st_size
     else:
       org_entries[file] = entry.offset
 
@@ -434,7 +434,7 @@ def recreate_archive(changed_filenames: list[str], archive_path: str) -> None:
         data = None
         file = entry.v_path.decode("utf-8")
         if file in changed_filenames:
-          data = (APP_DIR_PATH / "mod/dropzone" / file).read_bytes()
+          data = (MOD_PATH / file).read_bytes()
         elif entry.is_symlink:
           continue
         else:
@@ -445,8 +445,8 @@ def recreate_archive(changed_filenames: list[str], archive_path: str) -> None:
         new_archive.write(data)
 
 def expand_into_archive(filename: str, merge_path: str) -> None:
-  src_path = APP_DIR_PATH / "mod/dropzone" / filename
-  mod_merge_path = APP_DIR_PATH / "mod/dropzone" / merge_path
+  src_path = MOD_PATH / filename
+  mod_merge_path = MOD_PATH / merge_path
   copy_files_to_mod(merge_path)
   archive_info = get_sarc_file_info(mod_merge_path, True)
   offsets_to_update = []
@@ -558,7 +558,7 @@ def copy_dropzone(replace: bool = False) -> None:
         shutil.rmtree(dropzone_path)
       except FileNotFoundError as e:  # suppress error if user hits "Replace" when there is no /dropzone folder
         pass
-    shutil.copytree(APP_DIR_PATH / "mod/dropzone", dropzone_path, dirs_exist_ok=True)
+    shutil.copytree(MOD_PATH, dropzone_path, dirs_exist_ok=True)
   else:
     raise FileNotFoundError('Could not find game path to save mods!\nUse the "set path" button to select your game directory.')
 

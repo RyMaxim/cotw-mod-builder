@@ -1,24 +1,27 @@
+from __future__ import annotations
+
 import json
 import math
 import textwrap
 import traceback
 import webbrowser
-from importlib.metadata import version
 from pathlib import Path
+from tkinter import TclError
 
 import FreeSimpleGUI as sg
-from tkinter import TclError
 import requests
 from deepmerge import always_merger
-from packaging.version import Version as package_version
+from packaging.version import Version
 
 from modbuilder import logo, mods, party
 from modbuilder.logging_config import get_logger
-from modbuilder.widgets import create_option, generate_buttons, valid_option_value
+from modbuilder.assets import validate_org_bundle
+from modbuilder.constants import GITHUB_LATEST_API_URL, GITHUB_RELEASES_URL, NEXUSMODS_RELEASES_URL
+from modbuilder.version import get_version
+from modbuilder.widgets import (create_option, generate_buttons, valid_option_value)
 
 logger = get_logger(__name__)
-
-__version__ = version("modbuilder-revived")
+__version__ = get_version()
 
 DEFAULT_FONT = "_ 14"
 SMALL_FONT = "_ 11"
@@ -40,12 +43,12 @@ def _check_for_update() -> None:
   release_data = _get_latest_release()
   if release_data:
     latest_tag = release_data.get("tag_name", "").lstrip("v")
-    if package_version(latest_tag) > package_version(__version__):
+    if Version(latest_tag) > __version__:
       _show_update_popup(release_data)
 
 def _get_latest_release() -> dict:
   try:
-    resp = requests.get("https://api.github.com/repos/RyMaxim/cotw-mod-builder/releases/latest", timeout=2)
+    resp = requests.get(GITHUB_LATEST_API_URL, timeout=2)
     resp.raise_for_status()
     data = resp.json()
     return data
@@ -54,10 +57,9 @@ def _get_latest_release() -> dict:
   return {}
 
 def _show_update_popup(release_data: dict) -> None:
-  nexus_url = "https://www.nexusmods.com/thehuntercallofthewild/mods/410?tab=files"
   github_url = release_data["html_url"]
   layout = [
-    [sg.Text(f"A newer version is available!", text_color="yellow")],
+    [sg.Text("A newer version is available!", text_color="yellow")],
     [sg.Text(release_data["name"])],
     [sg.Button("NexusMods", key="-NEXUSMODS-"), sg.Button("GitHub", key="-GITHUB-")],
   ]
@@ -68,12 +70,112 @@ def _show_update_popup(release_data: dict) -> None:
     if event in (sg.WINDOW_CLOSED, "Close"):
       break
     elif event == "-NEXUSMODS-":
-      webbrowser.open(nexus_url)
-      break
+      webbrowser.open(NEXUSMODS_RELEASES_URL)
     elif event == "-GITHUB-":
       webbrowser.open(github_url)
+  window.close()
+
+def _show_org_warning_popup(message: str, release_data: dict | None = None) -> None:
+  layout = [
+    [sg.Text("Asset bundle version could not be fully validated.", text_color="yellow")],
+    [sg.Multiline(message, size=(90, 14), disabled=True, no_scrollbar=False)],
+  ]
+
+  button_row = [sg.Button("OK")]
+  if release_data and release_data.get("html_url"):
+    button_row.append(sg.Button("GitHub Release", key="-ORG-GITHUB-"))
+  button_row.append(sg.Button("Releases Page", key="-ORG-RELEASES-"))
+  layout.append(button_row)
+
+  window = sg.Window("Asset Files Warning", layout, icon=logo.value, modal=True)
+  while True:
+    event, _values = window.read()
+    if event in (sg.WINDOW_CLOSED, "OK"):
+      break
+    elif event == "-ORG-GITHUB-" and release_data and release_data.get("html_url"):
+      webbrowser.open(release_data["html_url"])
+    elif event == "-ORG-RELEASES-":
+      webbrowser.open(GITHUB_RELEASES_URL)
+  window.close()
+
+def _show_org_error_popup(message: str) -> None:
+  layout = [
+    [sg.Text("Required asset files are missing or invalid.", text_color="yellow")],
+    [sg.Multiline(message, size=(90, 12), disabled=True, no_scrollbar=False)],
+    [sg.Button("OK")],
+  ]
+
+  window = sg.Window("Missing Assets", layout, icon=logo.value, modal=True)
+  while True:
+    event, _values = window.read()
+    if event in (sg.WINDOW_CLOSED, "OK"):
       break
   window.close()
+
+def _build_org_warning_message(
+    validation_result: dict[str, str | bool | None],
+    release_data: dict | None,
+) -> str:
+  """
+  Build the warning message shown when org assets may be outdated or invalid.
+
+  Args:
+      validation_result (dict): Result from validate_org_bundle().
+      release_data (dict | None): Latest GitHub release data, if available.
+
+  Returns:
+      str: User-facing warning message.
+  """
+  message = validation_result["message"]
+
+  if not release_data:
+    return message
+
+  latest_tag = release_data.get("tag_name", "").lstrip("v")
+  latest_name = release_data.get("name") or latest_tag
+
+  if not latest_tag:
+    return message
+
+  try:
+    if Version(latest_tag) > __version__:
+      message += (
+        "\n\n"
+        f"A newer Mod Builder release is also available: {latest_name}"
+      )
+    else:
+      message += (
+        "\n\n"
+        f"Latest GitHub release:\n{latest_name}"
+      )
+  except Exception:
+    message += (
+      "\n\n"
+      f"Latest GitHub release:\n{latest_name}"
+    )
+
+  return message
+
+def _check_org_assets() -> bool:
+  """
+  Validate org asset bundle and show any required UI warnings/errors.
+
+  Returns:
+      bool: True if startup should continue, False if the application should exit.
+  """
+  validation_result = validate_org_bundle(__version__)
+
+  if validation_result["severity"] == "none":
+    return True
+
+  if validation_result["severity"] == "error":
+    _show_org_error_popup(validation_result["message"])
+    return False
+
+  release_data = _get_latest_release()
+  warning_message = _build_org_warning_message(validation_result, release_data)
+  _show_org_warning_popup(warning_message, release_data)
+  return True
 
 def _warn_user_onedrive_folder() -> None:
   parts = [p.lower() for p in mods.APP_DIR_PATH.parts]
@@ -502,9 +604,12 @@ def main() -> None:
   ]
 
   window = sg.Window("COTW: Mod Builder - Revived", layout, resizable=True, font=DEFAULT_FONT, icon=logo.value, size=(1300, 800), finalize=True)
-  _get_mods(window)
+
+  if not _check_org_assets():
+    return
   _check_for_update()
   _warn_user_onedrive_folder()
+  _get_mods(window)
 
   while True:
     event, values = window.read()

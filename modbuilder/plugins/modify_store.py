@@ -108,16 +108,19 @@ class StoreItem:
       matches = re.search(pattern, name)
       display_name = f"{category}: {matches.group(1).capitalize()} {matches.group(2)}"
     else:
-      skin_types = {
-        "t1": "Paint",
-        "t2": "Spray",
-        "t3": "Material",
-        "t4": "Camo",
-        "t5": "Wrap",
-      }
-      pattern = r'(t\d)_(\d+)$'  # camo_h2_lunar_new_year_1_t3_01 >> "Material 01"
-      matches = re.search(pattern, name)
-      display_name = f"{category}: {skin_types[matches.group(1)]} {matches.group(2)}"
+      try:
+        skin_types = {
+          "t1": "Paint",
+          "t2": "Spray",
+          "t3": "Material",
+          "t4": "Camo",
+          "t5": "Wrap",
+        }
+        pattern = r'(t\d)_(\d+)$'  # "t3_01" from "camo_h2_lunar_new_year_1_t3_01" >> "Material 01"
+        matches = re.search(pattern, name)
+        display_name = f"{category}: {skin_types[matches.group(1)]} {matches.group(2)}"
+      except AttributeError as _e:  # strange name - doesn't follow established pattern
+        display_name = f"{category}: {' '.join([x.capitalize() for x in name.split('_')])}"
     return display_name
 
   def _parse_trophy_holder_name(self) -> str:
@@ -522,7 +525,7 @@ def process(options: dict) -> None:
     for item in item_list:
       if discount > 0:
         updates.append({"offset": item.price.offset, "value": 1 - discount / 100, "transform": "multiply"})
-      if free_price > 0:
+      if free_price > 0 and item.price.value == 0:
         updates.append({"offset": item.price.offset, "value": free_price})
       if bulk_quantity > 0 and item.quantity.offset > 0:
         updates.append({"offset": item.quantity.offset, "value": bulk_quantity})

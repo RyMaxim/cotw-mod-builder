@@ -1,0 +1,67 @@
+-------------------------------------------------
+        Mod Builder - Revived Asset Files
+-------------------------------------------------
+
+The "org" folder contains extracted game files with default values used by Mod Builder - Revived.
+These files are no longer included in the git repository as several .ee bundle files exceed GitHub's 100mb limit.
+
+All files in the "org" folder are included with each Mod Builder - Revived release build.
+This asset bundle is made available for users running from source (hatch run modbuilder).
+The files can also be manually applied to a built release (modbuilder.exe).
+
+Follow the instructions below that match how you run Mod Builder - Revived.
+
+This archive contains:
+- org/
+- name_map.yaml
+
+-------------------------------------------------
+  >>> ALWAYS OVERWRITE FILES WHEN PROMPTED! <<<
+-------------------------------------------------
+
+Mod Builder plugins are updated to be compatible with the files for that release version.
+Failure to overwrite existing files can result in unexpected behavior and game crashes.
+
+
+-------------------------------------------------
+   Running from source (hatch run modbuilder)
+-------------------------------------------------
+
+Copy both:
+- org
+- name_map.yaml
+
+into:
+- cotw-mod-builder/modbuilder/
+
+After copying, the final paths should be:
+- cotw-mod-builder/modbuilder/org
+- cotw-mod-builder/modbuilder/name_map.yaml
+
+
+-------------------------------------------------
+    Running a built release (modbuilder.exe)
+-------------------------------------------------
+
+Copy both:
+- org
+- name_map.yaml
+
+into:
+- modbuilder/_internal/
+NOTE: This is the "_internal" folder next to modbuilder.exe
+
+After copying, the final paths should be:
+- modbuilder/_internal/org
+- modbuilder/_internal/name_map.yaml
+
+
+------------------------------------------------
+
+
+Mod Builder - Revived checks the asset bundle version using org/version.txt on startup.
+
+- If the versions match, startup continues normally.
+- If the versions do not match, Mod Builder will warn that the org files may be outdated.
+
+NOTE: When running from source, you can delete org/version.txt to ignore the version check during development.

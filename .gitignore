@@ -6,6 +6,8 @@ __pycache__
 build
 modbuilder/new
 dist
+modbuilder/_build_meta.py
+modbuilder/org/version.txt
 modbuilder_revived.egg-info
 mod
 game_path.txt
