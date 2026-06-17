@@ -520,8 +520,9 @@ def process(options: dict) -> None:
     selected_item = next((i for i in item_list if i.name == options["name"]), None)
     if selected_item:
       # Weapon skins and reticles do not work properly with a price of 0. Enforce a minimum value of 1
-      if selected_item.type == "Skin":
-        price = max(options["price"], 1)
+      price = options["price"]
+      if selected_item.type == "skin":
+        price = max(price, 1)
       updates.append({"offset": selected_item.price.offset, "value": price})
       if options["quantity"] > 0 and selected_item.quantity.offset > 0:
         updates.append({"offset": selected_item.quantity.offset, "value": options["quantity"]})
@@ -540,7 +541,7 @@ def process(options: dict) -> None:
       if discount > 0:
         discounted_price = item.price.value * (1 - discount / 100)
         # Weapon skins and reticles do not work properly with a price of 0. Enforce a minimum value of 1
-        if item.type == "Skin":
+        if item.type == "skin":
           discounted_price = max(discounted_price, 1)
         updates.append({"offset": item.price.offset, "value": discounted_price})
       if free_price > 0 and item.price.value == 0:
