@@ -17,7 +17,11 @@ logger = get_logger(__name__)
 
 DEBUG = False
 NAME = "Modify Store"
-DESCRIPTION = "Modify prices and quantites of store items or apply bulk changes to an entire category. Individual and bulk changes in the same category can cause unintended results."
+DESCRIPTION = (
+  "Modify prices and quantites of store items or apply bulk changes to an entire category. Individual and bulk changes in the same category can cause unintended results."
+  '\n"Locked" value controls item visibility and availability in the store:'
+  "\n1 = unlocked and available, 5 = locked and hidden from the store, other values = restricted by quest, weapon score, or other requirement"
+)
 EQUIPMENT_FILE = mods.EQUIPMENT_DATA_FILE
 LURE_FILE = modify_lures.FILE
 
@@ -274,10 +278,14 @@ def get_option_elements() -> sg.Column:
           sg.T("Individual:", p=((10,0),(10,0)), text_color="orange"),
           sg.Checkbox("Auto-update price, quantity, and weight", font="_ 12", default=True, k="store_update_item_values", enable_events=True, p=((15,0),(10,0))),
         ],
-        [sg.T("Price:", p=((30,0),(10,0))), sg.Input("", size=10, p=((34,0),(10,0)), k="store_item_price")],
+        [
+          sg.T("Price:", p=((30,0),(10,0))),
+          sg.Input("", size=10, p=((34,0),(10,0)), k="store_item_price"),
+          sg.T("",font="_ 12 italic", text_color="orange", p=((10,10),(10,0)), k="price_label")
+        ],
         [sg.T("Quantity:", p=((30,0),(10,0)), k="store_item_quantity_label"), sg.Input("", size=10, p=((10,0),(10,0)), k="store_item_quantity")],
-        [sg.T("Weight:", p=((30,0),(10,0)), k="store_item_weight_label"), sg.Input("", size=10, p=((17,0),(10,0)), k="store_item_weight")],
-        # [sg.T("Locked:", p=((30,0),(10,0))), sg.Input("", size=10, p=((22,0),(10,0)), k="store_item_locked")],
+        [sg.T("Weight:", p=((30,0),(10,0)), k="store_item_weight_label"), sg.Input("", size=10, p=((18,0),(10,0)), k="store_item_weight")],
+        [sg.T("Locked:", p=((30,0),(10,0))), sg.Input("", size=10, p=((15,0),(10,0)), k="store_item_locked")],
       ], p=(0,0), element_justification='left', vertical_alignment='top'),
       sg.Column([
         [sg.T("Bulk:", p=((0,0),(10,0)), text_color="orange"), sg.T('(use "Add Category Modification" to apply changes to all items in this category)', font="_ 12 italic", p=((0,0),(10,0)))],
@@ -297,11 +305,11 @@ def get_option_elements() -> sg.Column:
           sg.Input("", size=10, p=((10,0),(12,0)), k="store_bulk_weight"),
           sg.T('Leave blank to use defaults', font="_ 12 italic", text_color="orange", p=((10,10),(10,0)))
         ],
-        # [
-        #   sg.T("Category Locked:", p=((20,0),(12,0)), k="store_bulk_locked_label"),
-        #   sg.Input("", size=10, p=((10,0),(12,0)), k="store_bulk_locked"),
-        #   sg.T('Leave blank to use defaults', font="_ 12 italic", text_color="orange", p=((10,10),(10,0)))
-        # ],
+        [
+          sg.T("Category Locked:", p=((20,0),(12,0)), k="store_bulk_locked_label"),
+          sg.Input("", size=10, p=((10,0),(12,0)), k="store_bulk_locked"),
+          sg.T('Leave blank to use defaults', font="_ 12 italic", text_color="orange", p=((10,10),(10,0)))
+        ],
       ], p=((130,0),(0,0)), element_justification='left', vertical_alignment='top'),
     ],
   ]
@@ -332,19 +340,19 @@ def handle_event(event: str, window: sg.Window, values: dict) -> None:
         window["store_item_price"].update(selected_item.price.value)
         window["store_item_quantity"].update(selected_item.quantity.value)
         window["store_item_weight"].update(selected_item.weight.value)
-        # # Safe update for locked — only if attribute exists and has a numeric value
-        # if hasattr(selected_item, "locked") and getattr(selected_item, "locked") is not None:
-        #   try:
-        #     window["store_item_locked"].update(selected_item.locked.value)
-        #   except Exception:
-        #     window["store_item_locked"].update("")
-        # else:
-        #   window["store_item_locked"].update("")
+        # Safe update for locked — only if attribute exists and has a numeric value
+        if hasattr(selected_item, "locked") and getattr(selected_item, "locked") is not None:
+          try:
+            window["store_item_locked"].update(selected_item.locked.value)
+          except Exception:
+            window["store_item_locked"].update("")
+        else:
+          window["store_item_locked"].update("")
       else:
         window["store_item_price"].update("")
         window["store_item_quantity"].update("")
         window["store_item_weight"].update("")
-        # window["store_item_locked"].update("")
+        window["store_item_locked"].update("")
     if event.startswith("store_tab_"):
       # disable quantity for categories that don't have it
       category_quantity_disabled = bool(item_type in ["trophy_holder", "sight", "optic", "skin", "weapon", "feeder_bait"])
@@ -354,10 +362,13 @@ def handle_event(event: str, window: sg.Window, values: dict) -> None:
       category_weight_disabled = bool(item_type in ["trophy_holder", "skin", "feeder_bait"])
       window["store_item_weight"].update(disabled=category_weight_disabled)
       window["store_bulk_weight"].update(disabled=category_weight_disabled)
-      # # disable locked for feeder bait (Lure objects don't have locked)
-      # category_locked_disabled = bool(item_type == "feeder_bait")
-      # window["store_item_locked"].update(disabled=category_locked_disabled)
-      # window["store_bulk_locked"].update(disabled=category_locked_disabled)
+      # disable locked for feeder bait (Lure objects don't have locked)
+      category_locked_disabled = bool(item_type == "feeder_bait")
+      window["store_item_locked"].update(disabled=category_locked_disabled)
+      window["store_bulk_locked"].update(disabled=category_locked_disabled)
+      # Weapon skins and reticles do not work properly with a price of 0
+      zero_price_warning = "Skins min price = 1" if item_type == "skin" else ""
+      window["price_label"].update(zero_price_warning)
 
 def add_mod(window: sg.Window, values: dict) -> dict:
   selected_item = get_selected_item(window, values)
@@ -387,14 +398,14 @@ def add_mod(window: sg.Window, values: dict) -> dict:
       "invalid": "Provide a valid item weight"
     }
 
-  # try:
-  #   item_locked = int(values["store_item_locked"])
-  #   if not 0 <= item_locked <= 9:
-  #     raise ValueError
-  # except ValueError:
-  #   return {
-  #     "invalid": "Provide a valid item locked value (0-9)"
-  #   }
+  try:
+    item_locked = int(values["store_item_locked"])
+    if not 0 <= item_locked <= 9:
+      raise ValueError
+  except ValueError:
+    return {
+      "invalid": "Provide a valid item locked value (0-9)"
+    }
 
   return {
     "key": f"modify_store_{selected_item.name}",
@@ -407,7 +418,7 @@ def add_mod(window: sg.Window, values: dict) -> dict:
       "price": item_price,
       "quantity": item_quantity,
       "weight": item_weight,
-      # "locked": item_locked,
+      "locked": item_locked,
     }
   }
 
@@ -439,17 +450,17 @@ def add_mod_group(window: sg.Window, values: dict) -> dict:
       "invalid": "Provide a valid bulk weight"
     }
 
-  # if not values["store_bulk_locked"]:
-  #   bulk_locked = -1
-  # else:
-  #   try:
-  #     bulk_locked = int(values["store_bulk_locked"])
-  #     if not 0 <= bulk_locked <= 9:
-  #       raise ValueError
-  #   except ValueError:
-  #     return {
-  #       "invalid": "Provide a valid bulk locked value (0-9)"
-  #     }
+  if window["store_bulk_locked"].Disabled or not values["store_bulk_locked"]:
+    bulk_locked = -1
+  else:
+    try:
+      bulk_locked = int(values["store_bulk_locked"])
+      if not 0 <= bulk_locked <= 9:
+        raise ValueError
+    except ValueError:
+      return {
+        "invalid": "Provide a valid bulk locked value (0-9)"
+      }
 
   item_type = get_selected_category(window)
   return {
@@ -462,7 +473,7 @@ def add_mod_group(window: sg.Window, values: dict) -> dict:
       "free_price": bulk_free_price,
       "bulk_quantity": bulk_quantity,
       "bulk_weight": bulk_weight,
-      # "bulk_locked": bulk_locked,
+      "bulk_locked": bulk_locked,
     }
   }
 
@@ -476,8 +487,8 @@ def format_options(options: dict) -> str:
       details.append(f"{bulk_quantity} quantity")
     if (bulk_weight := options.get("bulk_weight", -1)) >= 0:
       details.append(f"{bulk_weight} kg")
-    # if (bulk_locked := options.get("bulk_locked", -1)) >= 0:
-    #   details.append(f"locked {bulk_locked}")
+    if (bulk_locked := options.get("bulk_locked", -1)) >= 0:
+      details.append(f"Locked: {bulk_locked}")
     return f"Modify Store Category: {mods.title_from_key(options['type'])} ({' ,'.join(details)})"
   else:  # single item
     display_name = options.get("display_name", options["name"])  # diplay_name added in 2.2.2
@@ -491,8 +502,8 @@ def format_options(options: dict) -> str:
       details.append(f"{options['quantity']} quantity")
     if (weight := options.get("weight", -1)) >= 0:
       details.append(f"{weight} kg")
-    # if (locked := options.get("locked", -1)) >= 0:
-    #   details.append(f"locked {locked}")
+    if (locked := options.get("locked", -1)) >= 0:
+      details.append(f"Locked: {locked}")
     return f"Modify Store: {mods.title_from_key(options['type'])} - {display_name} ({' ,'.join(details)})"
 
 def handle_key(mod_key: str) -> bool:
@@ -508,31 +519,40 @@ def process(options: dict) -> None:
   if "quantity" in options:  # single item
     selected_item = next((i for i in item_list if i.name == options["name"]), None)
     if selected_item:
-      updates.append({"offset": selected_item.price.offset, "value": options["price"]})
+      # Weapon skins and reticles do not work properly with a price of 0. Enforce a minimum value of 1
+      if selected_item.type == "Skin":
+        price = max(options["price"], 1)
+      updates.append({"offset": selected_item.price.offset, "value": price})
       if options["quantity"] > 0 and selected_item.quantity.offset > 0:
         updates.append({"offset": selected_item.quantity.offset, "value": options["quantity"]})
       if options["weight"] >= 0 and selected_item.weight.offset > 0:
         updates.append({"offset": selected_item.weight.offset, "value": options["weight"]})
-      # if "locked" in options and selected_item.locked.offset > 0:
-      #   updates.append({"offset": selected_item.locked.offset, "value": options["locked"]})
+      if "locked" in options and selected_item.locked.offset > 0:
+        updates.append({"offset": selected_item.locked.offset, "value": options["locked"]})
 
   if "bulk_quantity" in options:  # category
     discount = options["discount"]
     free_price = options["free_price"]
     bulk_quantity = options["bulk_quantity"]
     bulk_weight = options["bulk_weight"]
-    # bulk_locked = options.get("bulk_locked", -1)
+    bulk_locked = options.get("bulk_locked", -1)
     for item in item_list:
       if discount > 0:
-        updates.append({"offset": item.price.offset, "value": 1 - discount / 100, "transform": "multiply"})
+        discounted_price = item.price.value * (1 - discount / 100)
+        # Weapon skins and reticles do not work properly with a price of 0. Enforce a minimum value of 1
+        if item.type == "Skin":
+          discounted_price = max(discounted_price, 1)
+        updates.append({"offset": item.price.offset, "value": discounted_price})
       if free_price > 0 and item.price.value == 0:
         updates.append({"offset": item.price.offset, "value": free_price})
       if bulk_quantity > 0 and item.quantity.offset > 0:
         updates.append({"offset": item.quantity.offset, "value": bulk_quantity})
       if bulk_weight >= 0 and item.weight.offset > 0:
         updates.append({"offset": item.weight.offset, "value": bulk_weight})
-      # if bulk_locked >= 0 and item.locked.offset > 0:
-      #   updates.append({"offset": item.locked.offset, "value": bulk_locked})
+      # # Feeder Bait are imported from Modify Lures and do not have a "locked" attribute
+      # if item.type != "feeder_bait":
+      if bulk_locked >= 0 and item.locked.offset > 0:
+        updates.append({"offset": item.locked.offset, "value": bulk_locked})
 
   mods.apply_updates_to_file(LURE_FILE if options["type"] == "feeder_bait" else EQUIPMENT_FILE, updates)
 
@@ -578,6 +598,9 @@ def match_old_item(options: dict) -> StoreItem:
 
 def handle_update(mod_key: str, mod_options: dict, version: str) -> tuple[str, dict]:
   """
+  2.7.0
+  - Add "Locked" valued to show/hide items in the shop
+  - Weapon skins and reticles have a minimum price of 1 to prevent errors
   2.2.13
   - Modify prices of Feeder Bait from `animal_interest.bin` + Modify Lures
   2.2.7
@@ -596,16 +619,28 @@ def handle_update(mod_key: str, mod_options: dict, version: str) -> tuple[str, d
       selected_item = match_old_item(mod_options)  # Try to parse the old item names/offsets to match with a StoreItem object
     if not selected_item:
       raise ValueError(f"Unable to match item \"{mod_options['name']}\"")
+
+    # Weapon skins and reticles do not work properly with a price of 0. Enforce a minimum value of 1
+    if selected_item.type == "Skin":
+      price = max(mod_options["price"], 1)
+    else:
+      price = mod_options["price"]
+    # Feeder Bait does not have a "locked" attribute - default to -1
+    if selected_item.type == "feeder_bait":
+      locked = -1
+    else:  # fall back to item's default value
+      locked = mod_options.get("locked", selected_item.locked.value)
+
     updated_mod_key = f"modify_store_{selected_item.name}"
     updated_mod_options = {
       "type": selected_item.type,
       "name": selected_item.name,
       "display_name": selected_item.display_name,
       "file": LURE_FILE if selected_item.type == "feeder_bait" else EQUIPMENT_FILE,
-      "price": mod_options["price"],
+      "price": price,
       "quantity": mod_options.get("quantity", 0),
       "weight": mod_options.get("weight", -1),
-      # "locked": mod_options.get("locked", selected_item.locked.value if getattr(selected_item, "locked", None) else -1),
+      "locked": locked,
     }
 
   elif "free_price" in mod_options:  # category
@@ -617,7 +652,7 @@ def handle_update(mod_key: str, mod_options: dict, version: str) -> tuple[str, d
       "free_price": mod_options["free_price"],
       "bulk_quantity": mod_options.get("bulk_quantity", 0),  # some pre-2.1.0 version didn't have "bulk_quantity"
       "bulk_weight": mod_options.get("bulk_weight", -1),  # added in 2.2.7
-      # "bulk_locked": mod_options.get("bulk_locked", -1),
+      "bulk_locked": mod_options.get("bulk_locked", -1),
     }
 
   else:

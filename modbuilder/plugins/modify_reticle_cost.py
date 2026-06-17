@@ -3,7 +3,8 @@ from deca.ff_rtpc import RtpcNode
 
 DEBUG = False
 NAME = "Modify Reticle Cost"
-DESCRIPTION = "Reduce the cost of changing the reticle on your scopes. Requires the Scopes and Crosshairs DLC pack."
+DESCRIPTION = "Reduce the cost of changing the reticle on your scopes. Requires the Scopes and Crosshairs DLC pack. Reticles have a minimum price of $1"
+WARNING = 'Values may be overwritten if using a "Category Discount" on Skins with Modify Store.'
 FILE = mods.EQUIPMENT_DATA_FILE
 OPTIONS = [
     {
@@ -13,6 +14,7 @@ OPTIONS = [
      "max": 4500.0,
      "initial": 4500.0,
      "increment": 10,
+     "note": "True minimum value is 1. Value of 0 will be overridden to prevent errors"
     }
 ]
 PRESETS = [
@@ -49,8 +51,8 @@ class Reticle:
 def load_reticles() -> list[Reticle]:
   reticles = []
   equipment_data = mods.open_rtpc(mods.APP_DIR_PATH / "org" / FILE)
-  # reticles are stored in the "skins" table at index 5
-  for equipment_node in equipment_data.child_table[5].child_table:
+  # reticles are stored in the "skins" table at index 6
+  for equipment_node in equipment_data.child_table[6].child_table:
     try:
       reticle = Reticle(equipment_node)
       reticles.append(reticle)
@@ -64,9 +66,21 @@ def format_options(options: dict) -> str:
 
 def update_values_at_offset(options: dict) -> list[dict]:
   offsets_and_values = []
-  cost = int(options["cost"])
+  cost = max(int(options["cost"]), 1)
   reticles = load_reticles()
   for reticle in reticles:
     update = {"offset": reticle.offset, "value": cost}
     offsets_and_values.append(update)
   return offsets_and_values
+
+def handle_update(mod_key: str, mod_options: dict, version: str) -> tuple[str, dict]:
+  """
+  2.7.0
+  - Reticles have a minimum price of 1 to prevent errors
+  """
+  updated_mod_key = mod_key
+  # Reticles do not work properly with a price of 0. Enforce a minimum value of 1
+  updated_mod_options = {
+    "cost": max(mod_options["cost"], 1)
+  }
+  return updated_mod_key, updated_mod_options

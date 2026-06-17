@@ -22,7 +22,6 @@ This archive contains:
 Mod Builder plugins are updated to be compatible with the files for that release version.
 Failure to overwrite existing files can result in unexpected behavior and game crashes.
 
-
 -------------------------------------------------
    Running from source (hatch run modbuilder)
 -------------------------------------------------
@@ -37,7 +36,6 @@ into:
 After copying, the final paths should be:
 - cotw-mod-builder/modbuilder/org
 - cotw-mod-builder/modbuilder/name_map.yaml
-
 
 -------------------------------------------------
     Running a built release (modbuilder.exe)
@@ -55,9 +53,7 @@ After copying, the final paths should be:
 - modbuilder/_internal/org
 - modbuilder/_internal/name_map.yaml
 
-
 ------------------------------------------------
-
 
 Mod Builder - Revived checks the asset bundle version using org/version.txt on startup.
 

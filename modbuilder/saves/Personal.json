@@ -22,7 +22,8 @@
       "discount": 50,
       "free_price": 0,
       "bulk_quantity": 50,
-      "bulk_weight": -1
+      "bulk_weight": -1,
+      "bulk_locked": -1
     },
     "modify_store_misc": {
       "type": "misc",
@@ -30,7 +31,8 @@
       "discount": 50,
       "free_price": 0,
       "bulk_quantity": 50,
-      "bulk_weight": -1
+      "bulk_weight": -1,
+      "bulk_locked": -1
     },
     "modify_store_sight": {
       "type": "sight",
@@ -38,7 +40,8 @@
       "discount": 50,
       "free_price": 0,
       "bulk_quantity": 0,
-      "bulk_weight": -1
+      "bulk_weight": -1,
+      "bulk_locked": -1
     },
     "modify_store_optic": {
       "type": "optic",
@@ -46,7 +49,8 @@
       "discount": 50,
       "free_price": 0,
       "bulk_quantity": 0,
-      "bulk_weight": -1
+      "bulk_weight": -1,
+      "bulk_locked": -1
     },
     "modify_store_skin": {
       "type": "skin",
@@ -54,7 +58,8 @@
       "discount": 50,
       "free_price": 0,
       "bulk_quantity": 0,
-      "bulk_weight": -1
+      "bulk_weight": -1,
+      "bulk_locked": -1
     },
     "modify_store_weapon": {
       "type": "weapon",
@@ -62,7 +67,8 @@
       "discount": 80,
       "free_price": 0,
       "bulk_quantity": 0,
-      "bulk_weight": -1
+      "bulk_weight": -1,
+      "bulk_locked": -1
     },
     "modify_store_structure": {
       "type": "structure",
@@ -70,7 +76,8 @@
       "discount": 80,
       "free_price": 0,
       "bulk_quantity": 0,
-      "bulk_weight": -1
+      "bulk_weight": -1,
+      "bulk_locked": -1
     },
     "modify_store_lure": {
       "type": "lure",
@@ -78,7 +85,8 @@
       "discount": 50,
       "free_price": 0,
       "bulk_quantity": 50,
-      "bulk_weight": -1
+      "bulk_weight": -1,
+      "bulk_locked": -1
     },
     "increase_deployables": {
       "deployable_multiplier": 20.0
@@ -112,8 +120,7 @@
       "cooldown": 1.0
     },
     "modify_reticle_cost": {
-      "modify_reticle_cost": "Free",
-      "cost": 0.0
+      "cost": 1
     },
     "clean_scope_lenses": {},
     "remove_intro_logos": {}

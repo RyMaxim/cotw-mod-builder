@@ -10,6 +10,6 @@ fi
 rm -rf "$(pwd)/build" "$(pwd)/dist/modbuilder"
 
 python ./scripts/write_build_meta.py
-python ./scripts/write_org_version.py
+python ./scripts/write_asset_versions.py
 
 pyinstaller modbuilder.spec

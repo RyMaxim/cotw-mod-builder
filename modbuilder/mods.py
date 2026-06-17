@@ -5,7 +5,6 @@ import os
 import re
 import shutil
 import struct
-import sys
 from importlib.metadata import version
 from pathlib import Path
 from types import ModuleType
@@ -44,7 +43,7 @@ ANIMAL_INTEREST_FILE = "settings/hp_settings/animal_interest.bin"
 MODS_EQUIPMENT_UI_DATA = None
 MODS_LIST = DEBUG_MODS_LIST = None
 GLOBAL_FILES = LOCAL_PLAYER_FILES = NETWORK_PLAYER_FILES = GLOBAL_ANIMAL_FILES = None
-with open(APP_DIR_PATH / "name_map.yaml", "r") as file:
+with assets.get_name_map_file().open("r", encoding="utf-8") as file:
     NAME_MAP = yaml.safe_load(file)
 
 GLOBAL_FILES: dict

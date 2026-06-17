@@ -18,7 +18,7 @@ from modbuilder.logging_config import get_logger
 from modbuilder.assets import validate_org_bundle
 from modbuilder.constants import GITHUB_LATEST_API_URL, GITHUB_RELEASES_URL, NEXUSMODS_RELEASES_URL
 from modbuilder.version import get_version
-from modbuilder.widgets import (create_option, generate_buttons, valid_option_value)
+from modbuilder.widgets import create_option, generate_buttons, valid_option_value
 
 logger = get_logger(__name__)
 __version__ = get_version()
@@ -243,7 +243,8 @@ def _get_mod_options() -> list[dict]:
   for mod_key, mod in possible_mods.items():
     mod_details = []
     mod_details.append([sg.T("Description:", p=(10, 10), font="_ 14 underline", text_color="orange")])
-    mod_details.append([sg.T(textwrap.fill(mod.DESCRIPTION, TEXT_WRAP), p=(10,0))])
+    wrapped_description = [textwrap.fill(line, TEXT_WRAP) for line in mod.DESCRIPTION.split("\n")]
+    mod_details.append([sg.T("\n".join(wrapped_description), p=(10,0))])
 
     if hasattr(mod, "WARNING"):
       warning_header = sg.T(" WARNING ", font="_ 14", text_color="firebrick1", p=(10, 10), background_color="black")

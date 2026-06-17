@@ -4,9 +4,11 @@ import os
 import sys
 from pathlib import Path
 
+import yaml
 from packaging.version import InvalidVersion, Version
 
-from modbuilder.constants import GITHUB_RELEASES_URL, ORG_DIR_NAME, ORG_VERSION_FILENAME
+from modbuilder.constants import (GITHUB_RELEASES_URL, ORG_DIR_NAME,
+                                  ORG_VERSION_FILENAME)
 
 
 def should_skip_bundle_version_check() -> bool:
@@ -58,6 +60,26 @@ def get_name_map_file() -> Path:
         Path: Path to name_map.yaml.
     """
     return get_app_dir_path() / "name_map.yaml"
+
+
+def read_name_map_version() -> str | None:
+    """
+    Read the version value from name_map.yaml.
+
+    Returns:
+        str | None: Version string if present and non-empty, otherwise None.
+    """
+    name_map_file = get_name_map_file()
+
+    with name_map_file.open("r", encoding="utf-8") as file:
+        data = yaml.safe_load(file) or {}
+
+    version = data.get("version")
+    if version is None:
+        return None
+
+    version = str(version).strip()
+    return version or None
 
 
 def get_org_dir() -> Path:
@@ -120,9 +142,11 @@ def _build_result(
     message: str,
     expected_version: str,
     found_version: str | None = None,
-) -> dict[str, str | bool | None]:
+    warnings: list[str] | None = None,
+    errors: list[str] | None = None,
+) -> dict[str, str | bool | None | list[str]]:
     """
-    Build a standardized org bundle validation result.
+    Build a standardized asset bundle validation result.
 
     Args:
         ok (bool): True when startup may continue.
@@ -130,10 +154,12 @@ def _build_result(
         code (str): Machine-friendly result code.
         message (str): User-facing message.
         expected_version (str): Expected normalized bundle version.
-        found_version (str | None): Found bundle version, if available.
+        found_version (str | None): Found version details, if available.
+        warnings (list[str] | None): User-facing warning messages.
+        errors (list[str] | None): User-facing error messages.
 
     Returns:
-        dict[str, str | bool | None]: Standardized validation result.
+        dict[str, str | bool | None | list[str]]: Standardized validation result.
     """
     return {
         "ok": ok,
@@ -142,7 +168,266 @@ def _build_result(
         "message": message,
         "found_version": found_version,
         "expected_version": expected_version,
+        "warnings": warnings or [],
+        "errors": errors or [],
     }
+
+
+def _release_help() -> str:
+    return (
+        "Download + install the latest or matching asset bundle and restart "
+        f"Mod Builder:\n{GITHUB_RELEASES_URL}"
+    )
+
+
+def _dev_bypass_help() -> str:
+    if is_frozen():
+        return ""
+
+    return (
+        "\n\nFor local development only, you may bypass version checks by setting:\n"
+        "   MODBUILDER_SKIP_BUNDLE_VERSION_CHECK=1\n"
+        "or running with:\n"
+        "   hatch run dev:modbuilder"
+    )
+
+
+def _version_help(expected_version: str) -> str:
+    """
+    Build the standard version validation help message.
+
+    Includes the expected version, instructions for obtaining the
+    correct asset bundle, and local development bypass information
+    when applicable.
+
+    Args:
+        expected_version (str): Expected normalized asset bundle version.
+
+    Returns:
+        str: User-facing help text for version validation failures.
+    """
+    return (
+        f"Expected version: {expected_version}\n\n"
+        f"{_release_help()}"
+        f"{_dev_bypass_help()}"
+    )
+
+
+def _read_text_file(path: Path) -> str | None:
+    """
+    Read and normalize a text file.
+
+    The file contents are stripped of leading and trailing whitespace.
+    Empty files are treated as missing and return None.
+
+    Args:
+        path (Path): Path to the file to read.
+
+    Returns:
+        str | None: Normalized file contents if present and non-empty,
+            otherwise None.
+    """
+    if not path.exists():
+        return None
+
+    contents = path.read_text(encoding="utf-8").strip()
+    return contents or None
+
+
+def _read_name_map_yaml_version(path: Path) -> str | None:
+    """
+    Read the version value from name_map.yaml.
+
+    Args:
+        path (Path): Path to name_map.yaml.
+
+    Returns:
+        str | None: The version value if present and non-empty,
+            otherwise None.
+    """
+    with path.open("r", encoding="utf-8") as file:
+        data = yaml.safe_load(file) or {}
+
+    version = data.get("version")
+    if version is None:
+        return None
+
+    version = str(version).strip()
+    return version or None
+
+
+def _validate_required_files(org_dir: Path, name_map_file: Path) -> list[str]:
+    """
+    Validate that required asset files and folders exist.
+
+    Checks for the presence of:
+        - name_map.yaml
+        - the org asset directory
+
+    Also verifies that the org directory is not empty.
+
+    Args:
+        org_dir (Path): Expected org asset directory.
+        name_map_file (Path): Expected name_map.yaml file.
+
+    Returns:
+        list[str]: User-facing error messages for any missing or invalid
+            required assets. Returns an empty list when all required assets
+            are present.
+    """
+    errors = []
+
+    if not name_map_file.exists():
+        errors.append(f"Missing required asset file: {name_map_file}")
+
+    if not org_dir.exists():
+        errors.append(f"Missing required asset folder: {org_dir}")
+    elif not any(org_dir.iterdir()):
+        errors.append(f"The org asset folder is empty: {org_dir}")
+
+    return errors
+
+
+def _validate_version_value(
+    *,
+    label: str,
+    raw_version: str | None,
+    expected_version: str,
+    missing_message: str,
+) -> tuple[list[str], str | None]:
+    """
+    Validate a version string against the expected application version.
+
+    The version is considered invalid if it is missing, cannot be parsed
+    as a valid semantic version, or does not match the expected normalized
+    version.
+
+    Args:
+        label (str): Human-readable description of the asset being validated.
+        raw_version (str | None): Version string read from the asset.
+        expected_version (str): Expected normalized application version.
+        missing_message (str): Message displayed when the version is missing.
+
+    Returns:
+        tuple[list[str], str | None]:
+            warnings (list[str]): User-facing warning messages generated
+                during validation.
+            found_version (str | None): Raw version string that was found,
+                if available.
+    """
+    warnings = []
+
+    if raw_version is None:
+        warnings.append(missing_message)
+        return warnings, None
+
+    try:
+        parsed_version = Version(raw_version)
+    except InvalidVersion:
+        warnings.append(f"The {label} version is invalid. Found: {raw_version}")
+        return warnings, raw_version
+
+    actual_version = normalize_bundle_version(parsed_version)
+    if actual_version != expected_version:
+        warnings.append(
+            f"The {label} may be outdated. Found version: {raw_version}"
+        )
+
+    return warnings, raw_version
+
+
+def _validate_name_map_version(name_map_file: Path, expected_version: str) -> tuple[list[str], str | None]:
+    """
+    Validate the version stored in name_map.yaml.
+
+    Args:
+        name_map_file (Path): Path to name_map.yaml.
+        expected_version (str): Expected normalized application version.
+
+    Returns:
+        tuple[list[str], str | None]:
+            warnings (list[str]): User-facing warning messages generated
+                during validation.
+            found_version (str | None): Version read from name_map.yaml,
+                if available.
+    """
+    try:
+        raw_version = _read_name_map_yaml_version(name_map_file)
+    except Exception as exc:
+        return [
+            "Unable to read name_map.yaml.\n\n"
+            f"Expected file:\n{name_map_file}\n"
+            f"Error: {exc}\n\n"
+            f"{_release_help()}"
+        ], None
+
+    return _validate_version_value(
+        label="name_map.yaml asset file",
+        raw_version=raw_version,
+        expected_version=expected_version,
+        missing_message=(f"The name_map.yaml asset version is missing or empty: {name_map_file}"),
+    )
+
+
+def _validate_org_version(version_file: Path, expected_version: str) -> tuple[list[str], str | None]:
+    """
+    Validate the org asset bundle version file.
+
+    Args:
+        version_file (Path): Path to org/version.txt.
+        expected_version (str): Expected normalized application version.
+
+    Returns:
+        tuple[list[str], str | None]:
+            warnings (list[str]): User-facing warning messages generated
+                during validation.
+            found_version (str | None): Version read from org/version.txt,
+                if available.
+    """
+    raw_version = _read_text_file(version_file)
+
+    return _validate_version_value(
+        label="org asset bundle",
+        raw_version=raw_version,
+        expected_version=expected_version,
+        missing_message=(f"The org asset bundle version file is missing or empty: {version_file}"),
+    )
+
+
+def _format_validation_message(
+    *,
+    errors: list[str],
+    warnings: list[str],
+    expected_version: str,
+) -> str:
+    """
+    Build the final user-facing validation message.
+
+    Args:
+        errors (list[str]): Fatal asset validation errors.
+        warnings (list[str]): Non-fatal asset validation warnings.
+        expected_version (str): Expected normalized asset bundle version.
+
+    Returns:
+        str: User-facing validation message.
+    """
+    sections = []
+
+    if errors:
+        sections.append("Errors:\n\n" + "\n\n".join(f"- {error}" for error in errors))
+
+    if warnings:
+        sections.append("Warnings:\n\n" + "\n\n".join(f"- {warning}" for warning in warnings))
+
+    sections.append(
+        f"Expected asset version: {expected_version}\n\n"
+        "How to fix this:\n\n"
+        "Download and install the latest or matching asset bundle, then restart Mod Builder:\n"
+        f"{GITHUB_RELEASES_URL}"
+        f"{_dev_bypass_help()}"
+    )
+
+    return "\n\n---\n\n".join(sections)
 
 
 def validate_org_bundle(app_version: Version) -> dict[str, str | bool | None]:
@@ -181,57 +466,20 @@ def validate_org_bundle(app_version: Version) -> dict[str, str | bool | None]:
     name_map_file = get_name_map_file()
     expected_version = normalize_bundle_version(app_version)
 
-    release_help = (
-        "Download + install the latest or matching asset bundle and restart "
-        f"Mod Builder:\n{GITHUB_RELEASES_URL}"
-    )
+    errors = _validate_required_files(org_dir, name_map_file)
 
-    dev_bypass_help = ""
-    if not is_frozen():
-        dev_bypass_help = (
-            "\n\nFor local development only, you may bypass version checks by setting:\n"
-            "   MODBUILDER_SKIP_BUNDLE_VERSION_CHECK=1\n"
-            "or running with:\n"
-            "   hatch run dev:modbuilder"
-        )
-
-    if not name_map_file.exists():
+    if errors:
         return _build_result(
             ok=False,
             severity="error",
-            code="missing_name_map",
-            message=(
-                "Missing required asset file.\n\n"
-                f"Expected file:\n{name_map_file}\n\n"
-                f"{release_help}"
+            code="asset_errors",
+            message=_format_validation_message(
+                errors=errors,
+                warnings=[],
+                expected_version=expected_version,
             ),
             expected_version=expected_version,
-        )
-
-    if not org_dir.exists():
-        return _build_result(
-            ok=False,
-            severity="error",
-            code="missing_org_dir",
-            message=(
-                "Missing required asset folder.\n\n"
-                f"Expected folder:\n{org_dir}\n\n"
-                f"{release_help}"
-            ),
-            expected_version=expected_version,
-        )
-
-    if not any(org_dir.iterdir()):
-        return _build_result(
-            ok=False,
-            severity="error",
-            code="empty_org_dir",
-            message=(
-                "The org asset folder is empty.\n\n"
-                f"Expected folder:\n{org_dir}\n\n"
-                f"{release_help}"
-            ),
-            expected_version=expected_version,
+            errors=errors,
         )
 
     if should_skip_bundle_version_check():
@@ -243,70 +491,33 @@ def validate_org_bundle(app_version: Version) -> dict[str, str | bool | None]:
             expected_version=expected_version,
         )
 
-    if not version_file.exists():
-        return _build_result(
-            ok=True,
-            severity="warning",
-            code="missing_version_file",
-            message=(
-                "The org asset bundle version file is missing.\n\n"
-                f"Expected file:\n{version_file}\n\n"
-                f"Expected version: {expected_version}\n\n"
-                f"{release_help}"
-                f"{dev_bypass_help}"
-            ),
-            expected_version=expected_version,
-        )
+    warnings = []
+    found_versions = []
 
-    raw_version = read_org_bundle_version()
-    if raw_version is None:
-        return _build_result(
-            ok=True,
-            severity="warning",
-            code="empty_version_file",
-            message=(
-                "The org asset bundle version file is empty.\n\n"
-                f"Expected file:\n{version_file}\n\n"
-                f"Expected version: {expected_version}\n\n"
-                f"{release_help}"
-                f"{dev_bypass_help}"
-            ),
-            expected_version=expected_version,
-        )
+    name_map_warnings, found_name_map_version = _validate_name_map_version(name_map_file, expected_version)
+    org_warnings, found_org_version = _validate_org_version(version_file, expected_version)
 
-    try:
-        bundle_version = Version(raw_version)
-    except InvalidVersion:
-        return _build_result(
-            ok=True,
-            severity="warning",
-            code="invalid_version_file",
-            message=(
-                "The org asset bundle version file is invalid.\n\n"
-                f"Found: {raw_version}\n"
-                f"Expected version: {expected_version}\n\n"
-                f"{release_help}"
-                f"{dev_bypass_help}"
-            ),
-            expected_version=expected_version,
-            found_version=raw_version,
-        )
+    warnings.extend(name_map_warnings)
+    warnings.extend(org_warnings)
 
-    actual_version = normalize_bundle_version(bundle_version)
-    if actual_version != expected_version:
+    if found_name_map_version:
+        found_versions.append(f"name_map.yaml={found_name_map_version}")
+    if found_org_version:
+        found_versions.append(f"org/version.txt={found_org_version}")
+
+    if warnings:
         return _build_result(
             ok=True,
             severity="warning",
-            code="version_mismatch",
-            message=(
-                "The org asset bundle may be outdated.\n\n"
-                f"Found bundle version: {raw_version}\n"
-                f"Expected version: {expected_version}\n\n"
-                f"{release_help}"
-                f"{dev_bypass_help}"
+            code="asset_warnings",
+            message=_format_validation_message(
+                errors=[],
+                warnings=warnings,
+                expected_version=expected_version,
             ),
             expected_version=expected_version,
-            found_version=raw_version,
+            found_version=", ".join(found_versions) or None,
+            warnings=warnings,
         )
 
     return _build_result(
@@ -315,5 +526,5 @@ def validate_org_bundle(app_version: Version) -> dict[str, str | bool | None]:
         code="ok",
         message="",
         expected_version=expected_version,
-        found_version=raw_version,
+        found_version=", ".join(found_versions) or None,
     )

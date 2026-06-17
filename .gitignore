@@ -10,5 +10,7 @@ modbuilder/_build_meta.py
 modbuilder/org/version.txt
 modbuilder_revived.egg-info
 mod
+org
+name_map.yaml
 game_path.txt
 _sandbox

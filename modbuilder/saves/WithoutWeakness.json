@@ -125,8 +125,7 @@
       "cooldown": 1.0
     },
     "modify_reticle_cost": {
-      "modify_reticle_cost": "Free",
-      "cost": 0.0
+      "cost": 1
     },
     "modify_store_feeder_bait": {
       "type": "feeder_bait",
@@ -134,7 +133,8 @@
       "discount": 90,
       "free_price": 0,
       "bulk_quantity": 0,
-      "bulk_weight": -1
+      "bulk_weight": -1,
+      "bulk_locked": -1
     },
     "modify_store_skin": {
       "type": "skin",
@@ -142,7 +142,8 @@
       "discount": 90,
       "free_price": 0,
       "bulk_quantity": 0,
-      "bulk_weight": -1
+      "bulk_weight": -1,
+      "bulk_locked": -1
     },
     "modify_store_structure": {
       "type": "structure",
@@ -150,7 +151,8 @@
       "discount": 90,
       "free_price": 0,
       "bulk_quantity": 0,
-      "bulk_weight": -1
+      "bulk_weight": -1,
+      "bulk_locked": -1
     }
   }
 }
