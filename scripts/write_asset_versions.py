@@ -1,3 +1,9 @@
+"""
+The modbuilder_X.X.X.7z archive and executable are versioned as major.minor.patch (2.7.1)
+The modbuilder/org asset bundle and name_map.yaml are versioned as major.minor (2.7)
+A new asset bundle is only required when the major or minor version changes due to game updates or large changes to Mod Builder.
+"""
+
 from __future__ import annotations
 
 import re
@@ -7,12 +13,26 @@ from pathlib import Path
 from packaging.version import Version
 
 
-def get_base_version(version: str) -> str:
+def get_asset_version(version: str) -> str:
     """
-    Return the base release version from a pyproject version string.
+    Return the asset compatibility version from a pyproject version string.
+
+    Asset bundles are compatible across patch releases, so only the major and minor version are written.
+
+    Examples:
+        2.7.0 -> 2.7
+        2.7.1 -> 2.7
+        2.7.1.dev4 -> 2.7
+
+    Args:
+        version (str): Version string from pyproject.toml.
+
+    Returns:
+        str: Major/minor asset compatibility version.
     """
     parsed = Version(version)
-    return ".".join(str(part) for part in parsed.release)
+    major, minor = parsed.release[:2]
+    return f"{major}.{minor}"
 
 
 def write_org_bundle_version(repo_root: Path, version: str) -> None:
@@ -20,12 +40,13 @@ def write_org_bundle_version(repo_root: Path, version: str) -> None:
     Write the org asset bundle version file.
 
     Args:
-        repo_root (Path): Path to the project root
-        version (str): Asset bundle version.
+        repo_root (Path): Path to the project root.
+        version (str): Asset bundle compatibility version.
     """
     org_dir = repo_root / "modbuilder" / "org"
     if not org_dir.exists():
         raise FileNotFoundError(f"Missing org directory: {org_dir}")
+
     org_version_file = org_dir / "version.txt"
     org_version_file.write_text(f"{version}\n", encoding="utf-8")
     print(f"Wrote org bundle version {version} to {org_version_file}")
@@ -38,15 +59,17 @@ def update_name_map_version(repo_root: Path, version: str) -> None:
     The existing version line is replaced in-place to preserve comments, formatting, and key ordering.
 
     Args:
-        repo_root (Path): Path to the project root
-        version (str): Asset bundle version.
+        repo_root (Path): Path to the project root.
+        version (str): Asset bundle compatibility version.
 
     Raises:
-        ValueError: If no version field exists in name_map.yaml.
+        FileNotFoundError: If name_map.yaml does not exist.
+        ValueError: If there is not exactly one version field in name_map.yaml.
     """
     name_map_file = repo_root / "modbuilder" / "name_map.yaml"
     if not name_map_file.exists():
         raise FileNotFoundError(f"Missing name_map.yaml file: {name_map_file}")
+
     contents = name_map_file.read_text(encoding="utf-8")
 
     updated_contents, replacements = re.subn(
@@ -74,7 +97,7 @@ def main() -> None:
     pyproject_path = repo_root / "pyproject.toml"
 
     data = tomllib.loads(pyproject_path.read_text(encoding="utf-8"))
-    version = get_base_version(data["project"]["version"])
+    version = get_asset_version(data["project"]["version"])
 
     write_org_bundle_version(repo_root, version)
     update_name_map_version(repo_root, version)

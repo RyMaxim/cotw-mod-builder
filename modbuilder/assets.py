@@ -7,8 +7,7 @@ from pathlib import Path
 import yaml
 from packaging.version import InvalidVersion, Version
 
-from modbuilder.constants import (GITHUB_RELEASES_URL, ORG_DIR_NAME,
-                                  ORG_VERSION_FILENAME)
+from modbuilder.constants import GITHUB_RELEASES_URL, ORG_DIR_NAME, ORG_VERSION_FILENAME
 
 
 def should_skip_bundle_version_check() -> bool:
@@ -104,20 +103,23 @@ def get_org_version_file() -> Path:
 
 def normalize_bundle_version(version: Version) -> str:
     """
-    Normalize an application or bundle version to its base release version.
+    Normalize an application or bundle version to its asset compatibility version.
+    Asset bundles are compatible across patch releases, so only the major and minor version are compared.
 
     Examples:
-        1.2.3 -> 1.2.3
-        1.2.3.dev4 -> 1.2.3
-        1.2.3rc1 -> 1.2.3
+        1.2.0 -> 1.2
+        1.2.3 -> 1.2
+        1.2.3.dev4 -> 1.2
+        1.2.3rc1 -> 1.2
 
     Args:
         version (Version): Parsed version.
 
     Returns:
-        str: Base release version string.
+        str: Major/minor compatibility version string.
     """
-    return ".".join(str(part) for part in version.release)
+    major, minor = version.release[:2]
+    return f"{major}.{minor}"
 
 
 def read_org_bundle_version() -> str | None:
@@ -420,7 +422,7 @@ def _format_validation_message(
         sections.append("Warnings:\n\n" + "\n\n".join(f"- {warning}" for warning in warnings))
 
     sections.append(
-        f"Expected asset version: {expected_version}\n\n"
+        f"Expected asset compatibility version: {expected_version}.x\n\n"
         "How to fix this:\n\n"
         "Download and install the latest or matching asset bundle, then restart Mod Builder:\n"
         f"{GITHUB_RELEASES_URL}"

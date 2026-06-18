@@ -1,5 +1,7 @@
 @echo off
 REM Package Mod Builder - Revived into versioned 7z archives
+REM Mod Builder executable is versioned as major.minor.patch (2.7.1)
+REM Asset bundle is versioned as major.minor (2.7)
 setlocal
 
 set "VERSION="
@@ -10,6 +12,15 @@ set "VERSION=%VERSION:"=%"
 
 if not defined VERSION (
   echo ERROR: could not parse version from pyproject.toml
+  exit /b 1
+)
+
+for /f "tokens=1,2 delims=." %%A in ("%VERSION%") do (
+  set "ASSET_VERSION=%%A.%%B"
+)
+
+if not defined ASSET_VERSION (
+  echo ERROR: could not parse asset version from version: %VERSION%
   exit /b 1
 )
 
@@ -39,7 +50,7 @@ if not exist "%CD%\scripts\INSTALL_ORG_FILES.txt" (
 )
 
 set "APP_ARCHIVE=%CD%\dist\modbuilder_%VERSION%.7z"
-set "ORG_ARCHIVE=%CD%\dist\modbuilder_org_%VERSION%.7z"
+set "ORG_ARCHIVE=%CD%\dist\modbuilder_org_%ASSET_VERSION%.7z"
 set "STAGE_DIR=%CD%\dist\org_bundle_stage"
 
 del /q "%APP_ARCHIVE%" 2>nul

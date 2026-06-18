@@ -1,5 +1,7 @@
 #!/bin/sh
 # Package Mod Builder - Revived into versioned 7z archives
+# Mod Builder executable is versioned as major.minor.patch (2.7.1)
+# Asset bundle is versioned as major.minor (2.7)
 set -e
 
 VERSION="$(python - <<'PY'
@@ -13,6 +15,13 @@ PY
 
 if [ -z "$VERSION" ]; then
   echo "ERROR: could not parse version from pyproject.toml"
+  exit 1
+fi
+
+ASSET_VERSION="$(printf "%s" "$VERSION" | awk -F. '{print $1 "." $2}')"
+
+if [ -z "$ASSET_VERSION" ] || [ "$ASSET_VERSION" = "." ]; then
+  echo "ERROR: could not parse asset version from version: $VERSION"
   exit 1
 fi
 
@@ -42,7 +51,7 @@ if [ ! -f "scripts/INSTALL_ORG_FILES.txt" ]; then
 fi
 
 APP_ARCHIVE="dist/modbuilder_${VERSION}.7z"
-ORG_ARCHIVE="dist/modbuilder_org_${VERSION}.7z"
+ORG_ARCHIVE="dist/modbuilder_org_${ASSET_VERSION}.7z"
 STAGE_DIR="dist/org_bundle_stage"
 
 rm -f "$APP_ARCHIVE" "$ORG_ARCHIVE"
@@ -61,7 +70,7 @@ cp -R "modbuilder/org" "$STAGE_DIR/org"
 echo "Packaging org asset bundle..."
 (
   cd "$STAGE_DIR"
-  7z a "../modbuilder_org_${VERSION}.7z" "INSTALL_ORG_FILES.txt" "name_map.yaml" "org"
+  7z a "../modbuilder_org_${ASSET_VERSION}.7z" "INSTALL_ORG_FILES.txt" "name_map.yaml" "org"
 )
 
 rm -rf "$STAGE_DIR"

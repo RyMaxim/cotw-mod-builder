@@ -23,7 +23,7 @@ Several `.ee` files have reached over 100mb in size and can no longer be uploade
 
 Users that download the full release (`modbuilder.exe`) from NexusMods or GitHub do not need to worry about this. All required files are still included in built releases.
 
-To work around this issue for other devs, I publish separate asset bundles with each release starting with version 2.6.0. Each bundle contains all required files in the `org` folder and `name_map.yaml` for that release along with instructions on where to place the files. These are generally version-specific files for each Mod Builder - Revived release and plugins are updated alongside them each time new content is added to the game. Mod Builder - Revived will check the application and asset file versions on startup and provide a warning if there is a mismatch.
+To work around this issue for other devs, I publish separate asset bundles with each release starting with version 2.6.0. Each bundle contains all required files in the `org` folder and `name_map.yaml` for that release along with instructions on where to place the files. These are generally version-specific files for each Mod Builder - Revived release and plugins are updated alongside them each time new content is added to the game. Asset bundles are versioned by major.minor version. A new asset bundle is only required when the major or minor version changes due to game updates or large changes to the application. Mod Builder - Revived will check the application and asset file versions on startup and provide a warning if there is a mismatch.
 
 ### Update Game Files in the `/org` Folder
 

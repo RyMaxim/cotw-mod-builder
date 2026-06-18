@@ -539,7 +539,7 @@ def process(options: dict) -> None:
     bulk_locked = options.get("bulk_locked", -1)
     for item in item_list:
       if discount > 0:
-        discounted_price = item.price.value * (1 - discount / 100)
+        discounted_price = int(round(item.price.value * (1 - discount / 100)))
         # Weapon skins and reticles do not work properly with a price of 0. Enforce a minimum value of 1
         if item.type == "skin":
           discounted_price = max(discounted_price, 1)

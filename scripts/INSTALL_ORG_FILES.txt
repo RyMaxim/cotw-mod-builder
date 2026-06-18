@@ -23,6 +23,23 @@ Mod Builder plugins are updated to be compatible with the files for that release
 Failure to overwrite existing files can result in unexpected behavior and game crashes.
 
 -------------------------------------------------
+          Asset Bundle Versioning
+-------------------------------------------------
+
+Asset bundles are versioned by major.minor version.
+A new asset bundle is only required when the major or minor version changes due to game updates or large changes to Mod Builder.
+
+Examples:
+- Mod Builder 2.7.0 uses asset bundle 2.7
+- Mod Builder 2.7.3 uses asset bundle 2.7
+- Mod Builder 2.8.0 uses asset bundle 2.8
+
+Mod Builder - Revived checks the asset bundle version using org/version.txt on startup.
+- If the versions match, startup continues normally.
+- If the versions do not match, Mod Builder will warn that the org files may be outdated.
+
+
+-------------------------------------------------
    Running from source (hatch run modbuilder)
 -------------------------------------------------
 
@@ -55,9 +72,4 @@ After copying, the final paths should be:
 
 ------------------------------------------------
 
-Mod Builder - Revived checks the asset bundle version using org/version.txt on startup.
-
-- If the versions match, startup continues normally.
-- If the versions do not match, Mod Builder will warn that the org files may be outdated.
-
-NOTE: When running from source, you can delete org/version.txt to ignore the version check during development.
+NOTE: When running from source, use "hatch run dev:modbuilder" if you want to skip the version check at startup
