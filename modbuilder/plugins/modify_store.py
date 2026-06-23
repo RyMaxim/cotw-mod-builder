@@ -3,7 +3,7 @@ import re
 import FreeSimpleGUI as sg
 
 from deca.ff_rtpc import RtpcNode
-from modbuilder import mods
+from modbuilder import mods, mods2
 from modbuilder.logging_config import get_logger
 from modbuilder.mods import StatWithOffset
 
@@ -18,12 +18,62 @@ logger = get_logger(__name__)
 DEBUG = False
 NAME = "Modify Store"
 DESCRIPTION = (
-  "Modify prices and quantites of store items or apply bulk changes to an entire category. Individual and bulk changes in the same category can cause unintended results."
+  "Modify prices, quantities, unlock scores, and other store item values or apply bulk changes to an entire category. Individual and bulk changes in the same category can cause unintended results."
   '\n"Locked" value controls item visibility and availability in the store:'
   "\n1 = unlocked and available, 5 = locked and hidden from the store, other values = restricted by quest, weapon score, or other requirement"
 )
 EQUIPMENT_FILE = mods.EQUIPMENT_DATA_FILE
 LURE_FILE = modify_lures.FILE
+PLAYER_REWARDS_FILE = "settings/hp_settings/player_rewards.bin"
+SCORE_CATEGORY_ORDER = ("bow", "handgun", "rifle", "shotgun")
+SCORE_SHEET_BY_CATEGORY = {
+  "bow": "bow_score_levels",
+  "handgun": "handgun_score_levels",
+  "rifle": "rifle_score_levels",
+  "shotgun": "shotgun_score_levels",
+}
+SCORE_CATEGORY_LABELS = {
+  "unchanged": "Unchanged",
+  "bow": "Bow",
+  "handgun": "Handgun",
+  "rifle": "Rifle",
+  "shotgun": "Shotgun",
+}
+
+
+def _score_cell_value(adf, sheet: str, coordinates: str):
+  return mods2.XlsxCell(PLAYER_REWARDS_FILE, adf, {
+    "sheet": sheet,
+    "coordinates": coordinates,
+  }).value
+
+
+def _parse_equipment_unlocks(value) -> list[str]:
+  if not isinstance(value, bytes):
+    return []
+  return [name.strip() for name in value.decode("utf-8").split(",") if name.strip()]
+
+
+def load_score_progression() -> tuple[dict[str, list[int]], dict[str, tuple[str, int]]]:
+  adf = mods2.deserialize_adf(PLAYER_REWARDS_FILE, modded=False)
+  scores_by_category = {}
+  existing_unlocks = {}
+
+  for category, sheet_name in SCORE_SHEET_BY_CATEGORY.items():
+    sheet, _sheet_index = mods2.get_sheet(adf, sheet_name)
+    scores = []
+    for row in range(2, sheet["Rows"].value + 1):
+      score = int(_score_cell_value(adf, sheet_name, f"B{row}"))
+      equipment_names = _parse_equipment_unlocks(_score_cell_value(adf, sheet_name, f"C{row}"))
+      # Only expose gates already populated by the vanilla file. Populating an empty
+      # gate requires adding ADF strings/cell definitions that the game may reject.
+      if equipment_names and score not in scores:
+        scores.append(score)
+      for equipment_name in equipment_names:
+        existing_unlocks[equipment_name] = (category, score)
+    scores_by_category[category] = scores
+
+  return scores_by_category, existing_unlocks
 
 class StoreItem:
   __slots__ = (
@@ -286,6 +336,22 @@ def get_option_elements() -> sg.Column:
         [sg.T("Quantity:", p=((30,0),(10,0)), k="store_item_quantity_label"), sg.Input("", size=10, p=((10,0),(10,0)), k="store_item_quantity")],
         [sg.T("Weight:", p=((30,0),(10,0)), k="store_item_weight_label"), sg.Input("", size=10, p=((18,0),(10,0)), k="store_item_weight")],
         [sg.T("Locked:", p=((30,0),(10,0))), sg.Input("", size=10, p=((15,0),(10,0)), k="store_item_locked")],
+        [
+          sg.T("Score Type:", p=((30,0),(10,0))),
+          sg.Combo(
+            list(SCORE_CATEGORY_LABELS.values()),
+            default_value="Unchanged",
+            readonly=True,
+            size=12,
+            k="store_item_score_type",
+            enable_events=True,
+            p=((10,0),(10,0)),
+          ),
+        ],
+        [
+          sg.T("Unlock Score:", p=((30,0),(10,0))),
+          sg.Combo([], readonly=True, size=12, disabled=True, k="store_item_unlock_score", p=((10,0),(10,0))),
+        ],
       ], p=(0,0), element_justification='left', vertical_alignment='top'),
       sg.Column([
         [sg.T("Bulk:", p=((0,0),(10,0)), text_color="orange"), sg.T('(use "Add Category Modification" to apply changes to all items in this category)', font="_ 12 italic", p=((0,0),(10,0)))],
@@ -331,6 +397,49 @@ def get_selected_item(window: sg.Window, values: dict) -> StoreItem:
       pass
   return None
 
+def _score_category_from_label(value: str) -> str:
+  value = str(value or "unchanged").lower()
+  return value if value in SCORE_CATEGORY_LABELS else "unchanged"
+
+def _update_score_combo(window: sg.Window, category: str, score: int | None = None) -> None:
+  score_key = "store_item_unlock_score"
+  if category not in SCORE_CATEGORY_ORDER:
+    window[score_key].update(value="", values=[], disabled=True)
+    return
+  scores = SCORES_BY_CATEGORY[category]
+  window[score_key].update(
+    value=score if score in scores else "",
+    values=scores,
+    disabled=False,
+  )
+
+def _update_item_score_fields(selected_item: StoreItem | None, window: sg.Window) -> None:
+  category = "unchanged"
+  score = None
+  if selected_item:
+    current_assignment = EXISTING_SCORE_UNLOCKS.get(selected_item.name)
+    if current_assignment:
+      category, score = current_assignment
+    else:
+      inferred_category = (getattr(selected_item, "detailed_type", "") or "").lower()
+      if inferred_category in SCORE_CATEGORY_ORDER:
+        category = inferred_category
+  window["store_item_score_type"].update(SCORE_CATEGORY_LABELS[category])
+  _update_score_combo(window, category, score)
+
+def _get_score_options(values: dict) -> tuple[dict, str | None]:
+  category = _score_category_from_label(values.get("store_item_score_type"))
+  score_value = values.get("store_item_unlock_score")
+  if category == "unchanged" or score_value in (None, ""):
+    return {}, None
+  try:
+    score = int(score_value)
+  except (TypeError, ValueError):
+    return {}, "Provide a valid unlock score"
+  if score not in SCORES_BY_CATEGORY[category]:
+    return {}, f"Provide a valid {category} unlock score"
+  return {"score_type": category, "unlock_score": score}, None
+
 def handle_event(event: str, window: sg.Window, values: dict) -> None:
   if event.startswith("store_"):
     item_type = get_selected_category(window)
@@ -369,6 +478,11 @@ def handle_event(event: str, window: sg.Window, values: dict) -> None:
       # Weapon skins and reticles do not work properly with a price of 0
       zero_price_warning = "Skins min price = 1" if item_type == "skin" else ""
       window["price_label"].update(zero_price_warning)
+    if event.startswith(("store_list_", "store_tab_")):
+      _update_item_score_fields(selected_item, window)
+    elif event == "store_item_score_type":
+      score_category = _score_category_from_label(values["store_item_score_type"])
+      _update_score_combo(window, score_category, values.get("store_item_unlock_score"))
 
 def add_mod(window: sg.Window, values: dict) -> dict:
   selected_item = get_selected_item(window, values)
@@ -407,7 +521,11 @@ def add_mod(window: sg.Window, values: dict) -> dict:
       "invalid": "Provide a valid item locked value (0-9)"
     }
 
-  return {
+  score_options, score_error = _get_score_options(values)
+  if score_error:
+    return {"invalid": score_error}
+
+  result = {
     "key": f"modify_store_{selected_item.name}",
     "invalid": None,
     "options": {
@@ -421,6 +539,8 @@ def add_mod(window: sg.Window, values: dict) -> dict:
       "locked": item_locked,
     }
   }
+  result["options"].update(score_options)
+  return result
 
 def add_mod_group(window: sg.Window, values: dict) -> dict:
   bulk_discount = int(values["store_bulk_discount"])
@@ -504,17 +624,67 @@ def format_options(options: dict) -> str:
       details.append(f"{weight} kg")
     if (locked := options.get("locked", -1)) >= 0:
       details.append(f"Locked: {locked}")
+    if "score_type" in options and "unlock_score" in options:
+      details.append(f"{mods.title_from_key(options['score_type'])} score: {options['unlock_score']}")
     return f"Modify Store: {mods.title_from_key(options['type'])} - {display_name} ({' ,'.join(details)})"
 
 def handle_key(mod_key: str) -> bool:
   return mod_key.startswith("modify_store")
 
 def get_files(options: dict) -> list[str]:
-  return [LURE_FILE if options["type"] == "feeder_bait" else EQUIPMENT_FILE]
+  files = [LURE_FILE if options["type"] == "feeder_bait" else EQUIPMENT_FILE]
+  if "quantity" in options and "score_type" in options and "unlock_score" in options:
+    files.append(PLAYER_REWARDS_FILE)
+  return files
+
+def _serialize_equipment_unlocks(names: list[str]):
+  return ", ".join(names) if names else 0
+
+def _update_score_unlocks(item_names: list[str], category: str, selected_score: int) -> None:
+  if category not in SCORE_SHEET_BY_CATEGORY:
+    raise ValueError(f'Unknown score type "{category}"')
+  if selected_score not in SCORES_BY_CATEGORY[category]:
+    raise ValueError(f'Unknown {category} score gate "{selected_score}"')
+
+  item_names = list(dict.fromkeys(item_names))
+  item_name_set = set(item_names)
+  adf = mods2.deserialize_adf(PLAYER_REWARDS_FILE)
+  target_sheet_name = SCORE_SHEET_BY_CATEGORY[category]
+  target_sheet, _target_sheet_index = mods2.get_sheet(adf, target_sheet_name)
+  target_row = next(
+    row
+    for row in range(2, target_sheet["Rows"].value + 1)
+    if int(_score_cell_value(adf, target_sheet_name, f"B{row}")) == selected_score
+  )
+  coordinate_updates = []
+
+  for sheet_category, sheet_name in SCORE_SHEET_BY_CATEGORY.items():
+    sheet, _sheet_index = mods2.get_sheet(adf, sheet_name)
+    for row in range(2, sheet["Rows"].value + 1):
+      coordinates = f"C{row}"
+      equipment_names = _parse_equipment_unlocks(_score_cell_value(adf, sheet_name, coordinates))
+      original_names = list(equipment_names)
+      equipment_names = [name for name in equipment_names if name not in item_name_set]
+      if sheet_category == category and row == target_row:
+        equipment_names.extend(name for name in item_names if name not in equipment_names)
+
+      if equipment_names != original_names:
+        coordinate_updates.append({
+          "sheet": sheet_name,
+          "coordinates": coordinates,
+          "value": _serialize_equipment_unlocks(equipment_names),
+        })
+
+  if coordinate_updates:
+    mods2.apply_coordinate_updates_to_file(
+      PLAYER_REWARDS_FILE,
+      coordinate_updates,
+    )
 
 def process(options: dict) -> None:
   updates = []
   item_list = ALL_STORE_ITEMS[options["type"]]
+  selected_item = None
 
   if "quantity" in options:  # single item
     selected_item = next((i for i in item_list if i.name == options["name"]), None)
@@ -556,6 +726,13 @@ def process(options: dict) -> None:
         updates.append({"offset": item.locked.offset, "value": bulk_locked})
 
   mods.apply_updates_to_file(LURE_FILE if options["type"] == "feeder_bait" else EQUIPMENT_FILE, updates)
+
+  if selected_item and "score_type" in options and "unlock_score" in options:
+    _update_score_unlocks(
+      [selected_item.name],
+      options["score_type"],
+      int(options["unlock_score"]),
+    )
 
 def match_old_item(options: dict) -> StoreItem:
   selected_item = None
@@ -643,6 +820,15 @@ def handle_update(mod_key: str, mod_options: dict, version: str) -> tuple[str, d
       "weight": mod_options.get("weight", -1),
       "locked": locked,
     }
+    if "score_type" in mod_options and "unlock_score" in mod_options:
+      score_type = str(mod_options["score_type"]).lower()
+      unlock_score = int(mod_options["unlock_score"])
+      if score_type not in SCORE_SHEET_BY_CATEGORY or unlock_score not in SCORES_BY_CATEGORY[score_type]:
+        raise ValueError(f'Unknown {score_type} score gate "{unlock_score}"')
+      updated_mod_options.update({
+        "score_type": score_type,
+        "unlock_score": unlock_score,
+      })
 
   elif "free_price" in mod_options:  # category
     updated_mod_key = f"modify_store_{mod_options['type']}"
@@ -655,7 +841,6 @@ def handle_update(mod_key: str, mod_options: dict, version: str) -> tuple[str, d
       "bulk_weight": mod_options.get("bulk_weight", -1),  # added in 2.2.7
       "bulk_locked": mod_options.get("bulk_locked", -1),
     }
-
   else:
     raise ValueError(f"Unable to parse config: {mod_options}")
   return updated_mod_key, updated_mod_options
@@ -670,4 +855,5 @@ def _update_rapid_hunt_name_swap(mod_key: str, mod_options: dict, version: str) 
       mod_options["name"] = "equipment_weapon_sa_rifle_7_62_01"
   return mod_key, mod_options
 
+SCORES_BY_CATEGORY, EXISTING_SCORE_UNLOCKS = load_score_progression()
 ALL_STORE_ITEMS = load_store_items()

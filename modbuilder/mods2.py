@@ -321,7 +321,7 @@ def overwrite_value(extracted_adf: Adf, cell: XlsxCell, target: dict = None) -> 
     stringdata = adf_values["StringData"]
     # StringData values are arbitrary lengths. Their data_offsets are stored in info_offset headers before the array
     # Strings are byte-aligned and have data_offsets divisible by 8 with at least 1 byte of padding between strings
-    if target["index"] == len(stringdata.value):  # last value in array = padded until start of ValueData
+    if target["index"] == len(stringdata.value) - 1:  # last value in array = padded until start of ValueData
       padding = adf_values["ValueData"].data_offset - (target["offset"] + len(target["value"]))
     else:  # padded until start of next string
       padding = stringdata.value[target["index"] + 1].data_offset - (target["offset"] + len(target["value"]))
