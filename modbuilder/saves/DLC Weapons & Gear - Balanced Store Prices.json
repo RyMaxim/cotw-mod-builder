@@ -36,7 +36,7 @@
       "name": "equipment_weapon_ba_rifle_3006_02",
       "display_name": "Rifle: Eckers .30-06 Elegance",
       "file": "settings/hp_settings/equipment_data.bin",
-      "price": 55000,
+      "price": 45000,
       "quantity": 0,
       "weight": -1,
       "locked": 3
@@ -46,7 +46,7 @@
       "name": "equipment_weapon_ba_rifle_3006_03",
       "display_name": "Rifle: Eckers .30-06 Eminence",
       "file": "settings/hp_settings/equipment_data.bin",
-      "price": 65000,
+      "price": 45000,
       "quantity": 0,
       "weight": -1,
       "locked": 3
@@ -86,7 +86,7 @@
       "name": "equipment_weapon_caplock_muzzleloader_02",
       "display_name": "Rifle: Hudzik .50 Caplock Luna",
       "file": "settings/hp_settings/equipment_data.bin",
-      "price": 30000,
+      "price": 20000,
       "quantity": 0,
       "weight": -1,
       "locked": 3
@@ -96,7 +96,7 @@
       "name": "equipment_weapon_caplock_muzzleloader_03",
       "display_name": "Rifle: Hudzik .50 Caplock Sol",
       "file": "settings/hp_settings/equipment_data.bin",
-      "price": 40000,
+      "price": 20000,
       "quantity": 0,
       "weight": -1,
       "locked": 3
@@ -116,7 +116,7 @@
       "name": "equipment_weapon_sa_rifle_m1_garand_03",
       "display_name": "Rifle: M1 Iwaniec Collection",
       "file": "settings/hp_settings/equipment_data.bin",
-      "price": 40000,
+      "price": 30000,
       "quantity": 0,
       "weight": -1,
       "locked": 3
@@ -126,7 +126,7 @@
       "name": "equipment_weapon_sa_rifle_m1_garand_02",
       "display_name": "Rifle: M1 Iwaniec Reserve",
       "file": "settings/hp_settings/equipment_data.bin",
-      "price": 50000,
+      "price": 30000,
       "quantity": 0,
       "weight": -1,
       "locked": 3
@@ -216,7 +216,7 @@
       "name": "equipment_weapon_ba_rifle_mosin_nagant_02",
       "display_name": "Rifle: Solokhin MN1890 Frontline",
       "file": "settings/hp_settings/equipment_data.bin",
-      "price": 50000,
+      "price": 40000,
       "quantity": 0,
       "weight": -1,
       "locked": 3
@@ -286,7 +286,7 @@
       "name": "equipment_weapon_sa_rifle_ar10_308_02",
       "display_name": "Rifle: ZARZA-10 .308 Stalker",
       "file": "settings/hp_settings/equipment_data.bin",
-      "price": 65000,
+      "price": 55000,
       "quantity": 0,
       "weight": -1,
       "locked": 3
@@ -306,7 +306,7 @@
       "name": "equipment_weapon_sa_rifle_ar15_223_02",
       "display_name": "Rifle: ZARZA-15 .223 Ambusher",
       "file": "settings/hp_settings/equipment_data.bin",
-      "price": 43000,
+      "price": 33000,
       "quantity": 0,
       "weight": -1,
       "locked": 3
@@ -326,7 +326,7 @@
       "name": "equipment_weapon_sa_rifle_ar15_22lr_02",
       "display_name": "Rifle: ZARZA-15 .22LR Predator",
       "file": "settings/hp_settings/equipment_data.bin",
-      "price": 32000,
+      "price": 22000,
       "quantity": 0,
       "weight": -1,
       "locked": 3
@@ -366,7 +366,7 @@
       "name": "equipment_weapon_revolver_45_02",
       "display_name": "Handgun: .45 Rolleston Frontier",
       "file": "settings/hp_settings/equipment_data.bin",
-      "price": 50000,
+      "price": 30000,
       "quantity": 0,
       "weight": -1,
       "locked": 3
@@ -426,7 +426,7 @@
       "name": "equipment_weapon_pistol_sa_22_02",
       "display_name": "Handgun: Andersson .22LR Marksman",
       "file": "settings/hp_settings/equipment_data.bin",
-      "price": 39000,
+      "price": 19000,
       "quantity": 0,
       "weight": -1,
       "locked": 3
@@ -456,7 +456,7 @@
       "name": "equipment_weapon_revolver_410m_02",
       "display_name": "Handgun: Mangiafico 410/45 Colt Muertos",
       "file": "settings/hp_settings/equipment_data.bin",
-      "price": 30000,
+      "price": 20000,
       "quantity": 0,
       "weight": -1,
       "locked": 3
@@ -486,7 +486,7 @@
       "name": "equipment_weapon_drilling_combination_03",
       "display_name": "Shotgun: Grelck Drilling Rifle Select",
       "file": "settings/hp_settings/equipment_data.bin",
-      "price": 47000,
+      "price": 37000,
       "quantity": 0,
       "weight": -1,
       "locked": 3
@@ -526,7 +526,7 @@
       "name": "equipment_weapon_la_shotgun_1887_03",
       "display_name": "Shotgun: Miller Model 1891 Sheriff",
       "file": "settings/hp_settings/equipment_data.bin",
-      "price": 32000,
+      "price": 22000,
       "quantity": 0,
       "weight": -1,
       "locked": 3
@@ -576,7 +576,7 @@
       "name": "equipment_weapon_sbs_shotgun_20ga_02",
       "display_name": "Shotgun: Strecker SxS 20G Fiona",
       "file": "settings/hp_settings/equipment_data.bin",
-      "price": 20000,
+      "price": 8000,
       "quantity": 0,
       "weight": -1,
       "locked": 3
@@ -586,7 +586,7 @@
       "name": "equipment_weapon_sbs_shotgun_20ga_03",
       "display_name": "Shotgun: Strecker SxS 20G Hazel",
       "file": "settings/hp_settings/equipment_data.bin",
-      "price": 12000,
+      "price": 8000,
       "quantity": 0,
       "weight": -1,
       "locked": 3
@@ -596,7 +596,7 @@
       "name": "equipment_weapon_sbs_shotgun_20ga_04",
       "display_name": "Shotgun: Strecker SxS 20G Raven",
       "file": "settings/hp_settings/equipment_data.bin",
-      "price": 16000,
+      "price": 8000,
       "quantity": 0,
       "weight": -1,
       "locked": 3
@@ -616,7 +616,7 @@
       "name": "equipment_weapon_traditional_longbow_03",
       "display_name": "Bow: Alexander Longbow Ash",
       "file": "settings/hp_settings/equipment_data.bin",
-      "price": 7000,
+      "price": 5000,
       "quantity": 0,
       "weight": -1,
       "locked": 3
@@ -636,7 +636,7 @@
       "name": "equipment_weapon_traditional_longbow_02",
       "display_name": "Bow: Alexander Longbow Rough",
       "file": "settings/hp_settings/equipment_data.bin",
-      "price": 6000,
+      "price": 5000,
       "quantity": 0,
       "weight": -1,
       "locked": 3
@@ -646,7 +646,7 @@
       "name": "equipment_weapon_crossbow_165lb_02",
       "display_name": "Bow: Crosspoint CB-165 Arctic",
       "file": "settings/hp_settings/equipment_data.bin",
-      "price": 18000,
+      "price": 20000,
       "quantity": 0,
       "weight": -1,
       "locked": 3
@@ -656,7 +656,7 @@
       "name": "equipment_weapon_crossbow_165lb_01",
       "display_name": "Bow: Crosspoint CB-165 Classic",
       "file": "settings/hp_settings/equipment_data.bin",
-      "price": 20000,
+      "price": 18000,
       "quantity": 0,
       "weight": -1,
       "locked": 3
@@ -676,7 +676,7 @@
       "name": "equipment_weapon_crossbow_165lb_04",
       "display_name": "Bow: Crosspoint CB-165 Dark Star",
       "file": "settings/hp_settings/equipment_data.bin",
-      "price": 30000,
+      "price": 20000,
       "quantity": 0,
       "weight": -1,
       "locked": 3
@@ -696,7 +696,7 @@
       "name": "equipment_weapon_longbow_01",
       "display_name": "Bow: Houyi Recurve Bow Hidden Dragon",
       "file": "settings/hp_settings/equipment_data.bin",
-      "price": 8000,
+      "price": 6500,
       "quantity": 0,
       "weight": -1,
       "locked": 3
@@ -706,7 +706,7 @@
       "name": "equipment_weapon_longbow_02",
       "display_name": "Bow: Houyi Recurve Bow Moonlight",
       "file": "settings/hp_settings/equipment_data.bin",
-      "price": 7000,
+      "price": 6500,
       "quantity": 0,
       "weight": -1,
       "locked": 3
