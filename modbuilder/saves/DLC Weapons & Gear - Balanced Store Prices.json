@@ -1,0 +1,945 @@
+{
+  "version": "2.7.2",
+  "mod_options": {
+    "modify_store_equipment_weapon_sa_rifle_ar15_300_01": {
+      "type": "weapon",
+      "name": "equipment_weapon_sa_rifle_ar15_300_01",
+      "display_name": "Rifle: Arzyna .300 Mag Tactical",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 45000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_muzzleloader_50_01": {
+      "type": "weapon",
+      "name": "equipment_weapon_muzzleloader_50_01",
+      "display_name": "Rifle: Curman .50 Inline",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 22000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_ba_rifle_3006_01": {
+      "type": "weapon",
+      "name": "equipment_weapon_ba_rifle_3006_01",
+      "display_name": "Rifle: Eckers .30-06 Prestige",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 45000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_ba_rifle_3006_02": {
+      "type": "weapon",
+      "name": "equipment_weapon_ba_rifle_3006_02",
+      "display_name": "Rifle: Eckers .30-06 Elegance",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 45000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_ba_rifle_3006_03": {
+      "type": "weapon",
+      "name": "equipment_weapon_ba_rifle_3006_03",
+      "display_name": "Rifle: Eckers .30-06 Eminence",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 45000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_ba_rifle_300_01": {
+      "type": "weapon",
+      "name": "equipment_weapon_ba_rifle_300_01",
+      "display_name": "Rifle: Fors Elite .300",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 32000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_sa_rifle_30_06_01": {
+      "type": "weapon",
+      "name": "equipment_weapon_sa_rifle_30_06_01",
+      "display_name": "Rifle: Hansson .30-06",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 42000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_caplock_muzzleloader_01": {
+      "type": "weapon",
+      "name": "equipment_weapon_caplock_muzzleloader_01",
+      "display_name": "Rifle: Hudzik .50 Caplock Terra",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 20000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_caplock_muzzleloader_02": {
+      "type": "weapon",
+      "name": "equipment_weapon_caplock_muzzleloader_02",
+      "display_name": "Rifle: Hudzik .50 Caplock Luna",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 20000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_caplock_muzzleloader_03": {
+      "type": "weapon",
+      "name": "equipment_weapon_caplock_muzzleloader_03",
+      "display_name": "Rifle: Hudzik .50 Caplock Sol",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 20000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_ba_rifle_450_01": {
+      "type": "weapon",
+      "name": "equipment_weapon_ba_rifle_450_01",
+      "display_name": "Rifle: Johansson .450",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 28000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_sa_rifle_m1_garand_03": {
+      "type": "weapon",
+      "name": "equipment_weapon_sa_rifle_m1_garand_03",
+      "display_name": "Rifle: M1 Iwaniec Collection",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 30000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_sa_rifle_m1_garand_02": {
+      "type": "weapon",
+      "name": "equipment_weapon_sa_rifle_m1_garand_02",
+      "display_name": "Rifle: M1 Iwaniec Reserve",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 30000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_sa_rifle_m1_garand_01": {
+      "type": "weapon",
+      "name": "equipment_weapon_sa_rifle_m1_garand_01",
+      "display_name": "Rifle: M1 Iwaniec Veteran",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 30000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_ba_rifle_7mm_01": {
+      "type": "weapon",
+      "name": "equipment_weapon_ba_rifle_7mm_01",
+      "display_name": "Rifle: Malmer 7mm Magnum",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 55000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_la_rifle_44_01": {
+      "type": "weapon",
+      "name": "equipment_weapon_la_rifle_44_01",
+      "display_name": "Rifle: Moradi Model 1894",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 35000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_ba_rifle_308_01": {
+      "type": "weapon",
+      "name": "equipment_weapon_ba_rifle_308_01",
+      "display_name": "Rifle: Olsson Model 23 .308",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 42000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_sa_rifle_308_01": {
+      "type": "weapon",
+      "name": "equipment_weapon_sa_rifle_308_01",
+      "display_name": "Rifle: Perry .308",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 48000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_sa_rifle_7_62_01": {
+      "type": "weapon",
+      "name": "equipment_weapon_sa_rifle_7_62_01",
+      "display_name": "Rifle: Quist Reaper 7.62x39",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 28000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_ba_rifle_mosin_nagant_01": {
+      "type": "weapon",
+      "name": "equipment_weapon_ba_rifle_mosin_nagant_01",
+      "display_name": "Rifle: Solokhin MN1890 Assembly Line",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 30000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_ba_rifle_mosin_nagant_03": {
+      "type": "weapon",
+      "name": "equipment_weapon_ba_rifle_mosin_nagant_03",
+      "display_name": "Rifle: Solokhin MN1890 Defense Line",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 40000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_ba_rifle_mosin_nagant_02": {
+      "type": "weapon",
+      "name": "equipment_weapon_ba_rifle_mosin_nagant_02",
+      "display_name": "Rifle: Solokhin MN1890 Frontline",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 40000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_ba_rifle_338_01": {
+      "type": "weapon",
+      "name": "equipment_weapon_ba_rifle_338_01",
+      "display_name": "Rifle: Tsurugi LLR .338",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 65000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_ba_rifle_375_01": {
+      "type": "weapon",
+      "name": "equipment_weapon_ba_rifle_375_01",
+      "display_name": "Rifle: Vallgarda .375",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 62000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_ba_airrifle_45_01": {
+      "type": "weapon",
+      "name": "equipment_weapon_ba_airrifle_45_01",
+      "display_name": "Rifle: Vasquez Cyclone .45",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 15000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_sa_rifle_22lr_01": {
+      "type": "weapon",
+      "name": "equipment_weapon_sa_rifle_22lr_01",
+      "display_name": "Rifle: Virant .22LR Express",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 6000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_sa_rifle_22lr_02": {
+      "type": "weapon",
+      "name": "equipment_weapon_sa_rifle_22lr_02",
+      "display_name": "Rifle: Virant .22LR Klasika",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 16000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_sa_rifle_ar10_308_01": {
+      "type": "weapon",
+      "name": "equipment_weapon_sa_rifle_ar10_308_01",
+      "display_name": "Rifle: ZARZA-10 .308 Moonlight",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 55000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_sa_rifle_ar10_308_02": {
+      "type": "weapon",
+      "name": "equipment_weapon_sa_rifle_ar10_308_02",
+      "display_name": "Rifle: ZARZA-10 .308 Stalker",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 55000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_sa_rifle_ar15_223_01": {
+      "type": "weapon",
+      "name": "equipment_weapon_sa_rifle_ar15_223_01",
+      "display_name": "Rifle: ZARZA-15 .223 Midnight",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 33000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_sa_rifle_ar15_223_02": {
+      "type": "weapon",
+      "name": "equipment_weapon_sa_rifle_ar15_223_02",
+      "display_name": "Rifle: ZARZA-15 .223 Ambusher",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 33000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_sa_rifle_ar15_22lr_01": {
+      "type": "weapon",
+      "name": "equipment_weapon_sa_rifle_ar15_22lr_01",
+      "display_name": "Rifle: ZARZA-15 .22LR Shadow",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 22000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_sa_rifle_ar15_22lr_02": {
+      "type": "weapon",
+      "name": "equipment_weapon_sa_rifle_ar15_22lr_02",
+      "display_name": "Rifle: ZARZA-15 .22LR Predator",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 22000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_pistol_ss_243_02": {
+      "type": "weapon",
+      "name": "equipment_weapon_pistol_ss_243_02",
+      "display_name": "Handgun: .243 R. Cuomo Champion",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 25000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_pistol_ss_243_01": {
+      "type": "weapon",
+      "name": "equipment_weapon_pistol_ss_243_01",
+      "display_name": "Handgun: .243 R. Cuomo Competitor",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 20000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_revolver_45_01": {
+      "type": "weapon",
+      "name": "equipment_weapon_revolver_45_01",
+      "display_name": "Handgun: .45 Rolleston Cavalry",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 30000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_revolver_45_02": {
+      "type": "weapon",
+      "name": "equipment_weapon_revolver_45_02",
+      "display_name": "Handgun: .45 Rolleston Frontier",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 30000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_pistol_ss_4570_01": {
+      "type": "weapon",
+      "name": "equipment_weapon_pistol_ss_4570_01",
+      "display_name": "Handgun: .45-70 Jernberg Superior",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 20000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_pistol_10mm_01": {
+      "type": "weapon",
+      "name": "equipment_weapon_pistol_10mm_01",
+      "display_name": "Handgun: 10mm Davani 40A",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 15000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_pistol_10mm_02": {
+      "type": "weapon",
+      "name": "equipment_weapon_pistol_10mm_02",
+      "display_name": "Handgun: 10mm Davani G4LS",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 25000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_pistol_sa_22_01": {
+      "type": "weapon",
+      "name": "equipment_weapon_pistol_sa_22_01",
+      "display_name": "Handgun: Andersson .22LR Woodsman",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 9000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_pistol_sa_22_03": {
+      "type": "weapon",
+      "name": "equipment_weapon_pistol_sa_22_03",
+      "display_name": "Handgun: Andersson .22LR Defender",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 19000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_pistol_sa_22_02": {
+      "type": "weapon",
+      "name": "equipment_weapon_pistol_sa_22_02",
+      "display_name": "Handgun: Andersson .22LR Marksman",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 19000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_revolver_410m_01": {
+      "type": "weapon",
+      "name": "equipment_weapon_revolver_410m_01",
+      "display_name": "Handgun: Mangiafico 410/45 Colt Flat Black",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 10000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_revolver_410m_03": {
+      "type": "weapon",
+      "name": "equipment_weapon_revolver_410m_03",
+      "display_name": "Handgun: Mangiafico 410/45 Colt Polished Steel",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 20000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_revolver_410m_02": {
+      "type": "weapon",
+      "name": "equipment_weapon_revolver_410m_02",
+      "display_name": "Handgun: Mangiafico 410/45 Colt Muertos",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 20000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_ou_shotgun_10ga_01": {
+      "type": "weapon",
+      "name": "equipment_weapon_ou_shotgun_10ga_01",
+      "display_name": "Shotgun: Gopi 10G Grand",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 22000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_drilling_combination_01": {
+      "type": "weapon",
+      "name": "equipment_weapon_drilling_combination_01",
+      "display_name": "Shotgun: Grelck Drilling Rifle Classic",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 27000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_drilling_combination_03": {
+      "type": "weapon",
+      "name": "equipment_weapon_drilling_combination_03",
+      "display_name": "Shotgun: Grelck Drilling Rifle Select",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 37000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_drilling_combination_02": {
+      "type": "weapon",
+      "name": "equipment_weapon_drilling_combination_02",
+      "display_name": "Shotgun: Grelck Drilling Rifle Carbon Fiber",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 37000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_la_shotgun_1887_01": {
+      "type": "weapon",
+      "name": "equipment_weapon_la_shotgun_1887_01",
+      "display_name": "Shotgun: Miller Model 1891 Rancher",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 12000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_la_shotgun_1887_02": {
+      "type": "weapon",
+      "name": "equipment_weapon_la_shotgun_1887_02",
+      "display_name": "Shotgun: Miller Model 1891 Deputy",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 22000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_la_shotgun_1887_03": {
+      "type": "weapon",
+      "name": "equipment_weapon_la_shotgun_1887_03",
+      "display_name": "Shotgun: Miller Model 1891 Sheriff",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 22000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_sa_shotgun_20ga_03": {
+      "type": "weapon",
+      "name": "equipment_weapon_sa_shotgun_20ga_03",
+      "display_name": "Shotgun: Nordin 20SA Artisan",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 20000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_sa_shotgun_20ga_02": {
+      "type": "weapon",
+      "name": "equipment_weapon_sa_shotgun_20ga_02",
+      "display_name": "Shotgun: Nordin 20SA Clandestine",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 20000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_sa_shotgun_20ga_01": {
+      "type": "weapon",
+      "name": "equipment_weapon_sa_shotgun_20ga_01",
+      "display_name": "Shotgun: Nordin 20SA Serviceman",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 20000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_sa_shotgun_10ga_01": {
+      "type": "weapon",
+      "name": "equipment_weapon_sa_shotgun_10ga_01",
+      "display_name": "Shotgun: Strandberg 10SA",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 25000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_sbs_shotgun_20ga_02": {
+      "type": "weapon",
+      "name": "equipment_weapon_sbs_shotgun_20ga_02",
+      "display_name": "Shotgun: Strecker SxS 20G Fiona",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 8000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_sbs_shotgun_20ga_03": {
+      "type": "weapon",
+      "name": "equipment_weapon_sbs_shotgun_20ga_03",
+      "display_name": "Shotgun: Strecker SxS 20G Hazel",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 8000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_sbs_shotgun_20ga_04": {
+      "type": "weapon",
+      "name": "equipment_weapon_sbs_shotgun_20ga_04",
+      "display_name": "Shotgun: Strecker SxS 20G Raven",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 8000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_sbs_shotgun_20ga_01": {
+      "type": "weapon",
+      "name": "equipment_weapon_sbs_shotgun_20ga_01",
+      "display_name": "Shotgun: Strecker SxS 20G Scarlett",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 8000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_traditional_longbow_03": {
+      "type": "weapon",
+      "name": "equipment_weapon_traditional_longbow_03",
+      "display_name": "Bow: Alexander Longbow Ash",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 5000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_traditional_longbow_01": {
+      "type": "weapon",
+      "name": "equipment_weapon_traditional_longbow_01",
+      "display_name": "Bow: Alexander Longbow Lacquered",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 5000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_traditional_longbow_02": {
+      "type": "weapon",
+      "name": "equipment_weapon_traditional_longbow_02",
+      "display_name": "Bow: Alexander Longbow Rough",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 5000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_crossbow_165lb_02": {
+      "type": "weapon",
+      "name": "equipment_weapon_crossbow_165lb_02",
+      "display_name": "Bow: Crosspoint CB-165 Arctic",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 20000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_crossbow_165lb_01": {
+      "type": "weapon",
+      "name": "equipment_weapon_crossbow_165lb_01",
+      "display_name": "Bow: Crosspoint CB-165 Classic",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 18000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_crossbow_165lb_03": {
+      "type": "weapon",
+      "name": "equipment_weapon_crossbow_165lb_03",
+      "display_name": "Bow: Crosspoint CB-165 Warden",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 20000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_crossbow_165lb_04": {
+      "type": "weapon",
+      "name": "equipment_weapon_crossbow_165lb_04",
+      "display_name": "Bow: Crosspoint CB-165 Dark Star",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 20000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_longbow_04": {
+      "type": "weapon",
+      "name": "equipment_weapon_longbow_04",
+      "display_name": "Bow: Houyi Recurve Bow",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 6000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_longbow_01": {
+      "type": "weapon",
+      "name": "equipment_weapon_longbow_01",
+      "display_name": "Bow: Houyi Recurve Bow Hidden Dragon",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 6500,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_longbow_02": {
+      "type": "weapon",
+      "name": "equipment_weapon_longbow_02",
+      "display_name": "Bow: Houyi Recurve Bow Moonlight",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 6500,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_longbow_03": {
+      "type": "weapon",
+      "name": "equipment_weapon_longbow_03",
+      "display_name": "Bow: Houyi Recurve Bow Snakeskin",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 6500,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_compound_bow_orpheus_02": {
+      "type": "weapon",
+      "name": "equipment_weapon_compound_bow_orpheus_02",
+      "display_name": "Bow: Koter CB-65 Hephaestus",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 20000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_compound_bow_orpheus_01": {
+      "type": "weapon",
+      "name": "equipment_weapon_compound_bow_orpheus_01",
+      "display_name": "Bow: Koter CB-65 Orpheus",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 10000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_recurve_bow_01": {
+      "type": "weapon",
+      "name": "equipment_weapon_recurve_bow_01",
+      "display_name": "Bow: Stenberg Takedown Recurve Bow",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 7000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_optics_night_vision_01": {
+      "type": "optic",
+      "name": "equipment_optics_night_vision_01",
+      "display_name": "GenZero 8x50 Night Vision",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 20000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_sight_rifle_scope_night_vision_4-8x_100mm_01": {
+      "type": "sight",
+      "name": "equipment_sight_rifle_scope_night_vision_4-8x_100mm_01",
+      "display_name": "Angler 4-8x100 Night Vision",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 28000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_sight_compound_bow_rangefinder_01": {
+      "type": "sight",
+      "name": "equipment_sight_compound_bow_rangefinder_01",
+      "display_name": "Brightsignt Rangefinder",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 16000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_sight_rifle_scope_3_9x44mm_01": {
+      "type": "sight",
+      "name": "equipment_sight_rifle_scope_3_9x44mm_01",
+      "display_name": "Falcon 3-9x44 Drilling",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 5000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_scope_muzzleloader_4-8x32_01": {
+      "type": "sight",
+      "name": "equipment_scope_muzzleloader_4-8x32_01",
+      "display_name": "Galileo 4-8x32 Muzzleloader",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 10000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_sight_rifle_scope_night_vision_1-4x_24mm_01": {
+      "type": "sight",
+      "name": "equipment_sight_rifle_scope_night_vision_1-4x_24mm_01",
+      "display_name": "GenZero 1-4x24 Night Vision",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 18000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_sight_crossbow_scope_1-5x_30mm_01": {
+      "type": "sight",
+      "name": "equipment_sight_crossbow_scope_1-5x_30mm_01",
+      "display_name": "Hawken 1-5x30",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 5000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_scope_3-7x_33mm_01": {
+      "type": "sight",
+      "name": "equipment_scope_3-7x_33mm_01",
+      "display_name": "Hermes 3-7x33",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 8000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_sight_rifle_scope_4-12x_33mm_01": {
+      "type": "sight",
+      "name": "equipment_sight_rifle_scope_4-12x_33mm_01",
+      "display_name": "Odin 4-12x33",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 24000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_lure_caller_snort_wheeze_01": {
+      "type": "lure",
+      "name": "equipment_lure_caller_snort_wheeze_01",
+      "display_name": "Caller: Buck \"Snort Wheeze\"",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 6000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_remote_caller_01": {
+      "type": "lure",
+      "name": "equipment_remote_caller_01",
+      "display_name": "Caller: FOXPRO X360 Remote",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 15000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_sight_reflex_02": {
+      "type": "sight",
+      "name": "equipment_sight_reflex_02",
+      "display_name": "Marksman Davani Reflex Sight",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 8000,
+      "quantity": 0,
+      "weight": -1,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_la_rifle_22m_01": {
+      "type": "weapon",
+      "name": "equipment_weapon_la_rifle_22m_01",
+      "display_name": "Rifle: Anantha Action .22 MAG",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 12000,
+      "quantity": 0,
+      "weight": 3.0,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_pa_rifle_257_01": {
+      "type": "weapon",
+      "name": "equipment_weapon_pa_rifle_257_01",
+      "display_name": "Rifle: Frost .257",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 9000,
+      "quantity": 0,
+      "weight": 3.0,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_ss_shotgun_410_01": {
+      "type": "weapon",
+      "name": "equipment_weapon_ss_shotgun_410_01",
+      "display_name": "Shotgun: Giddings SSC .410 Coyote",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 4000,
+      "quantity": 0,
+      "weight": 2.0,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_ba_rifle_500_01": {
+      "type": "weapon",
+      "name": "equipment_weapon_ba_rifle_500_01",
+      "display_name": "Rifle: Richardsson .500",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 80000,
+      "quantity": 0,
+      "weight": 4.5,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_ba_rifle_17mr_01": {
+      "type": "weapon",
+      "name": "equipment_weapon_ba_rifle_17mr_01",
+      "display_name": "Rifle: Joneros .17HMR",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 8000,
+      "quantity": 0,
+      "weight": 2.5,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_ba_rifle_25_06_01": {
+      "type": "weapon",
+      "name": "equipment_weapon_ba_rifle_25_06_01",
+      "display_name": "Rifle: Alis Precision Shot .25-06",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 12000,
+      "quantity": 0,
+      "weight": 3.5,
+      "locked": 3
+    },
+    "modify_store_equipment_weapon_rifle_br_combination_01": {
+      "type": "weapon",
+      "name": "equipment_weapon_rifle_br_combination_01",
+      "display_name": "Shotgun: Cassidy Combination Shotgun",
+      "file": "settings/hp_settings/equipment_data.bin",
+      "price": 45000,
+      "quantity": 0,
+      "weight": 3.5,
+      "locked": 3
+    }
+  }
+}
